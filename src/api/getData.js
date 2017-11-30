@@ -1,4 +1,9 @@
 import ax from '@/config/axios';
+/**
+ * OSS图片上传 签名接口
+ */
+
+export const getsign = () => ax('/mapi/oss/getsign');
 
 /**
  * 登陆

@@ -9,6 +9,7 @@
     <img src="./../assets/1.jpg" class="avator">
     <el-dropdown-menu slot="dropdown">
       <el-dropdown-item command="home">首页</el-dropdown-item>
+      <el-dropdown-item command="personalData">个人资料</el-dropdown-item>
       <el-dropdown-item command="singout">退出</el-dropdown-item>
     </el-dropdown-menu>
   </el-dropdown>
@@ -38,6 +39,8 @@ export default {
     async handleCommand(command) {
       if (command == 'home') {
         this.$router.push('/manage');
+      } else if (command == 'personalData') {
+        this.$router.push('/dataManagement');
       } else if (command == 'singout') {
         const res = await signout();
         if (res.status == 1) {
@@ -75,5 +78,8 @@ export default {
 }
 .el-dropdown-menu__item {
     text-align: center;
+}
+.el-dropdown {
+    cursor: pointer;
 }
 </style>

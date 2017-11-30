@@ -194,7 +194,7 @@
     </div>
   </div> -->
   <el-row :gutter="20" style="margin-top: 10px;margin-bottom: 10px;">
-    <el-col :span="4" :offset="10">
+    <el-col :span="4" :offset="10" style="min-width:200px;">
       <el-button type="primary" v-show="editStart" @click="editStates(1)" plain>修改信息</el-button>
       <el-button type="primary" v-show="!editStart" @click="editStates(2)" plain>提交</el-button>
       <el-button type="primary" v-show="!editStart" @click="editStates(3)" plain>取消</el-button>

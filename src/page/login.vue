@@ -51,8 +51,8 @@ export default {
             trigger: 'blur'
           },
           {
-            type: 'number',
-            message: '用户名必须为数字值'
+            type: 'string',
+            message: '用户名必须为string'
           }
         ],
         password: [{

@@ -19,7 +19,7 @@
       </el-option>
     </el-select>
   </div>
-  <div class="el-col el-col-8" style="margin: 15px;">
+  <div class="el-col el-col-8" style="margin: 15px;width:400px;">
     <el-date-picker
       v-model="value4"
       type="datetimerange"
@@ -43,36 +43,41 @@
       prop="date"
       label="订单号"
       align="center"
-      width="180">
+      show-overflow-tooltip>
     </el-table-column>
     <el-table-column
       prop="name"
       label="订单姓名"
-      align="center"
-      width="180">
+      show-overflow-tooltip
+      align="center">
     </el-table-column>
     <el-table-column
       prop="address"
       align="center"
+      show-overflow-tooltip
       label="订单手机号">
     </el-table-column>
     <el-table-column
       prop="address"
       align="center"
+      show-overflow-tooltip
       label="下单时间">
     </el-table-column>
     <el-table-column
       prop="address"
+      show-overflow-tooltip
       align="center"
       label="订单状态">
     </el-table-column>
     <el-table-column
       prop="address"
       align="center"
+      show-overflow-tooltip
       label="订单金额">
     </el-table-column>
     <el-table-column
       prop="address"
+      show-overflow-tooltip
       align="center"
       label="订单药品">
     </el-table-column>
@@ -102,6 +107,8 @@ export default {
       count: 20,
       input2: '',
       input3: '',
+      currentPage: 1,
+      currentPageSize: 10,
       tableData: [{
         date: '2016-05-02',
         name: '王小虎',

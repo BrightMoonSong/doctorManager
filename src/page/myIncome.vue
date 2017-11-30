@@ -19,7 +19,7 @@
       </el-option>
     </el-select>
   </div>
-  <div class="el-col el-col-8" style="margin: 15px;">
+  <div class="el-col el-col-8" style="margin: 15px;width:400px;">
     <el-date-picker
       v-model="value4"
       type="datetimerange"
@@ -97,7 +97,9 @@ export default {
   data() {
     return {
       input1: '',
-      count: 20,
+      count: 4,
+      currentPage: 1,
+      currentPageSize: 10,
       input2: '',
       input3: '',
       tableData: [{
