@@ -43,7 +43,7 @@ https://segmentfault.com/a/1190000010559711
 import BaiduMap from 'vue-baidu-map';
 Vue.use(BaiduMap, {
   // ak 是在百度地图开发者平台申请的密钥 详见 http://lbsyun.baidu.com/apiconsole/key */
-  ak: 'L0EcRkZ9YBaGTOH5X1mpQqC7SVvDhmKL'
+  ak: 'BsApsWSRsIYzeBT6q86hsh1p6xnbDSOm'
 });
-<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=L0EcRkZ9YBaGTOH5X1mpQqC7SVvDhmKL"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=BsApsWSRsIYzeBT6q86hsh1p6xnbDSOm"></script>
 ```

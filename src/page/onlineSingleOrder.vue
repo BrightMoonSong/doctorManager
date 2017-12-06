@@ -8,12 +8,12 @@
         <el-input v-model="sizeForm.age" style="width: 75%;"></el-input>
       </el-form-item>
       <el-form-item label="性别">
-        <el-radio v-model="sizeForm.sex" label="1">男</el-radio>
-        <el-radio v-model="sizeForm.sex" label="2">女</el-radio>
+        <el-radio v-model="sizeForm.sex" :label="1">男</el-radio>
+        <el-radio v-model="sizeForm.sex" :label="2">女</el-radio>
       </el-form-item>
       <el-form-item label="手机号">
-        <el-input v-model="sizeForm.age" style="width: 75%;"></el-input>
-        <el-button type="primary" plain>查询</el-button>
+        <el-input v-model="sizeForm.phone" style="width: 75%;"></el-input>
+        <el-button type="primary" plain @click="searchUserByPhone">查询</el-button>
       </el-form-item>
       <el-form-item label="详细地址">
         <el-input v-model="sizeForm.address" style="width: 75%;"></el-input>
@@ -27,23 +27,23 @@
         </el-input>
       </el-form-item>
     </el-form>
-    <div class="adress">
+    <div class="adress" v-if="userSearched.userName">
       <el-card class="box-card">
         <ul class="card-ul">
           <li>
-            <span>姓名：</span><span>张三</span>
+            <span>姓名：</span><span v-text="userSearched.userName"></span>
           </li>
           <li>
-            <span>年龄：</span><span>56</span>
+            <span>年龄：</span><span v-text="userSearched.age"></span>
           </li>
           <li>
-            <span>性别：</span><span>男</span>
+            <span>性别：</span><span v-text="userSearched.sex===1?'男':'女'"></span>
           </li>
           <li>
-            <span>手机：</span><span>136010998789</span>
+            <span>手机：</span><span v-text="userSearched.phone"></span>
           </li>
           <li v-for="(item, index) in addressList" :key="index">
-            <span>详细地址：</span><span v-text="item"></span>
+            <span>详细地址：</span><span v-text="item.detailAddress"></span>
             <el-radio v-model="addressSelect" :label="index">选择</el-radio>
           </li>
         </ul>
@@ -53,40 +53,58 @@
     <div class="drugsSearch">
       <h4>推荐用药：</h4>
       <div class="el-col el-col-6" style="margin: 15px;">
-        <el-cascader style="width:100%;" :options="options2" v-model="selectedOptions3"></el-cascader>
+        <el-cascader style="width:100%;" placeholder="检索分类"
+          :options="selectList" v-model="cateIdList"
+          @active-item-change="handleItemChange"
+          :props="props"
+        ></el-cascader>
       </div>
       <div class="el-col el-col-6" style="margin: 15px;">
-        <el-input placeholder="按名称检索" v-model="input5" class="input-with-select">
-          <el-button slot="append" icon="el-icon-search"></el-button>
+        <el-input placeholder="关键词检索" v-model="parmValue" class="input-with-select">
+          <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
         </el-input>
       </div>
       <el-table :data="tableData" stripe border style="width: 100%;" ref="multipleTable"
         @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="date" label="商品名称" show-overflow-tooltip align="center"></el-table-column>
         <el-table-column
-          prop="name"
-          label="商品分类"
+          prop="src"
+          label="商品图片"
           show-overflow-tooltip
+          align="center">
+          <template slot-scope="scope">
+            <img :src="scope.row.masterImg" @click="clickImg(scope.row.masterImg)" alt="..." width="50">
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="name1"
+          show-overflow-tooltip
+          label="商品名称"
           align="center">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="name2"
+          align="center"
+          show-overflow-tooltip
+          label="商品简介">
+        </el-table-column>
+        <el-table-column
+          prop="salesPrice"
           align="center"
           show-overflow-tooltip
           label="商品售价">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="stock"
           align="center"
           show-overflow-tooltip
           label="商品库存">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="specification"
           align="center"
-          label="商品规格"
-          show-overflow-tooltip>
+          show-overflow-tooltip
+          label="商品规格">
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -110,29 +128,53 @@
     <div class="selectedGoods">
       <h4>已选药品：</h4>
       <el-table :data="selectedGoods" stripe border style="width: 100%;">
-        <el-table-column prop="date" label="商品名称" show-overflow-tooltip align="center"></el-table-column>
         <el-table-column
-          prop="name"
-          label="商品分类"
+          prop="src"
+          label="商品图片"
           show-overflow-tooltip
+          align="center">
+          <template slot-scope="scope">
+            <img :src="scope.row.masterImg" @click="clickImg(scope.row.masterImg)" alt="..." width="50">
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="name1"
+          show-overflow-tooltip
+          label="商品名称"
           align="center">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="name2"
+          align="center"
+          show-overflow-tooltip
+          label="商品简介">
+        </el-table-column>
+        <el-table-column
+          prop="salesPrice"
           align="center"
           show-overflow-tooltip
           label="商品售价">
         </el-table-column>
-        <el-table-column label="购买数量" align="center" width="150" prop="num">
-          <template slot-scope="scope">
-            <el-input-number size="mini" :step="1" :min="1" :max="100" v-model="scope.row.num"></el-input-number>
-          </template>
+        <el-table-column
+          prop="stock"
+          align="center"
+          show-overflow-tooltip
+          label="商品库存">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="specification"
           align="center"
-          label="商品规格"
-          show-overflow-tooltip>
+          show-overflow-tooltip
+          label="商品规格">
+        </el-table-column>
+        <el-table-column
+          label="商品个数"
+          align="center"
+          show-overflow-tooltip
+          width="150">
+          <template slot-scope="scope">
+            <el-input-number size="mini" :min="1" :max="scope.row.stock" v-model="scope.row.thisNum"></el-input-number>
+          </template>
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -141,7 +183,7 @@
           width="100">
           <template slot-scope="scope">
             <el-button @click="handleClick(scope.row)" type="text" size="small">详情</el-button>
-            <el-button @click="handleClick(scope.row)" type="text" size="small">删除</el-button>
+            <el-button @click="deleteRow(scope)" type="text" size="small">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -162,37 +204,64 @@
       <div class="drugsTotal">
         <span>药品总价：</span><span v-text="totalPrice+'元'"></span>
         <div class="el-col el-col-24" style="text-align: center;">
-          <el-button type="success" size="medium" round @click="toggleSelection(true)">确认下单</el-button>
-          <el-button type="warning" size="medium" round @click="toggleSelection(false)">取消</el-button>
+          <el-button type="success" size="medium" round @click="onSubmit(true)">确认下单</el-button>
+          <el-button type="warning" size="medium" round @click="onSubmit(false)">取消</el-button>
         </div>
       </div>
     </div>
-  </div>
+    <reg :dialogShowOrHide="dialogDegShowOrHide" :sizeForm="sizeForm" :selectedGoods="selectedGoods" :imageUrl="imageUrl"
+    :phone="sizeForm.phone" @dialog="onDialogRegChange"></reg>
+    <big-img v-if="showImg" @clickit="viewImg" :imgSrc="bigImgSrc"></big-img>
+    <detailmodel :dialogShowOrHide="dialogShowOrHide"
+    :selectTable="selectTable" @myevent="onResultChange" @dialog="onDialogChange"></detailmodel>
+</div>
 </template>
 
 <script>
 import {
-  prov,
+  findinfos,
+  findinfosbypid,
+  getinfoforgoods,
+  getuserinfo,
+  send,
+  findaddress,
   getsign
 } from '@/api/getData';
+import {
+  removeForIndex
+} from '@/config/mUtils';
 import {
   baseUrl,
   baseImgPath
 } from '@/config/env';
+import BigImg from '@/common/BigImg';
+import detailModel from '@/page/popup/detailModel';
+import reg from '@/page/popup/reg';
 
 export default {
   data() {
     return {
+      selectTable: [],
       baseUrl,
       baseImgPath,
-      totalPrice: 117,
+      totalPrice: 0,
       imageUrl: '',
       input5: '',
-      count: 7,
+      smsCode: '',
+      dialogShowOrHide: false,
+      dialogDegShowOrHide: false,
+      count: 0,
+      showImg: false,
       currentPage: 1,
       currentPageSize: 10,
-      options2: [],
-      selectedOptions3: [],
+      selectList: [],
+      props: {
+        value: 'value',
+        children: 'children'
+      },
+      cateIdList: [],
+      categoryId: '',
+      parmValue: '',
       selectedGoods: [],
       tableData: [],
       textarea2: '',
@@ -201,66 +270,115 @@ export default {
       addressList: [],
       sizeForm: {
         name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        age: '',
+        sex: 1,
+        phone: '',
+        address: ''
       },
       dataFileName: '',
-      dataObject: {}
+      dataObject: {},
+      userSearched: {},
+      outerVisible: false,
+      innerVisible: false
     };
   },
   mounted() {
-    this.provincialCity();
-    this.initData();
+    // 获取三级分类
+    this.findinfosbypid();
+    this.initData(1, 10);
+    this.initGetSign();
+    setInterval(() => {
+      this.initGetSign();
+    }, 10000);
   },
   methods: {
-    async initData() {
-      this.addressList = [
-        '山东省青岛市市北区人民路15号',
-        '山东省青岛市市北区人民路16号',
-        '山东省青岛市市北区人民路17号',
-        '山东省青岛市市北区人民路18号'
-      ];
-      let array = [{
-        date: '2016-05-03',
-        name: '王小虎1',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-02',
-        name: '王小虎2',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎3',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎4',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-08',
-        name: '王小虎5',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-06',
-        name: '王小虎6',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-07',
-        name: '王小虎7',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }];
-      for (let i = 0; i < array.length; i++) {
-        array[i].num = 1;
+    async searchUserByPhone() {
+      if (!this.sizeForm.phone) {
+        this.$message.error('请先填写手机号！');
+      } else {
+        let res = await getuserinfo(this.sizeForm.phone);
+        console.log(res);
+        if (res.data !== null) {
+          this.userSearched = res.data;
+          let resAddress = await findaddress(res.data.userId);
+          if (resAddress.data.length > 0) {
+            this.addressList = resAddress.data[0].detailAddress;
+          } else {
+            this.addressList = [];
+          }
+        } else {
+          // this.$message.error('该用户不是药到了会员,请自行填写用户信息！');
+          this.$notify.error({
+            title: '该用户不是药到了会员',
+            message: '请自行填写用户信息,下单后自动注册为药到了会员！'
+          });
+        }
       }
-      this.tableData = array;
+    },
+    search() {
+      if (this.cateIdList.length === 3) {
+        this.categoryId = this.cateIdList[2];
+      }
+      this.initData(1, 10);
+    },
+    async handleItemChange(val) {
+      if (val.length === 3) {
+        return;
+      }
+      let res = await findinfosbypid(val[val.length - 1]);
+      if (val.length === 1) {
+        let index = 0;
+        this.selectList.forEach((v, i) => {
+          if (v.value === val[val.length - 1]) {
+            index = i;
+          }
+        });
+        this.selectList[index].children = [];
+        res.data.forEach(val => {
+          let obj = {
+            value: val.cateId,
+            label: val.cateName,
+            children: []
+          };
+          this.selectList[0].children.push(obj);
+        });
+      } else if (val.length === 2) {
+        let index = 0;
+        let index1 = 0;
+        this.selectList.forEach((v, i) => {
+          if (v.value === val[0]) {
+            index = i;
+          }
+        });
+        this.selectList[index].children.forEach((m, n) => {
+          if (m.value === val[1]) {
+            index1 = n;
+          }
+        });
+        this.selectList[index].children[index1].children = [];
+        res.data.forEach(val => {
+          let obj = {
+            value: val.cateId,
+            label: val.cateName
+          };
+          this.selectList[index].children[index1].children.push(obj);
+        });
+      }
+    },
+    async findinfosbypid() {
+      let res = await findinfosbypid(0);
+      this.selectList = [];
+      res.data.forEach(val => {
+        let obj = {
+          value: val.cateId,
+          label: val.cateName,
+          children: []
+        };
+        this.selectList.push(obj);
+      });
+    },
+    async initGetSign() {
       const res = await getsign();
-      console.log(res);
-
       var oDate = new Date(); // 实例一个时间对象；
       var yearSec = '' + oDate.getFullYear() + (oDate.getMonth() + 1) + oDate.getDate() + oDate.getHours() + oDate.getMinutes() + oDate.getSeconds();
       var rand = '';
@@ -277,44 +395,110 @@ export default {
         'signature': res.data.signature
       };
     },
+    async initData(pageNo, pageSize) {
+      let res = await findinfos({
+        'pageSize': pageSize,
+        'pageNo': pageNo,
+        'parmValue': this.parmValue,
+        'categoryId': this.categoryId
+      });
+      if (res.data.length > 0) {
+        for (let i = 0; i < res.data.length; i++) {
+          res.data[i].thisNum = 1;
+        }
+      }
+      this.tableData = res.data;
+      this.count = res.totalSize;
+    },
     uploadImg(res, file) { // up, file, info   /res, file
-      console.log(res);
-      console.log(file);
       if (file.status === 'success') {
         this.imageUrl = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
-        console.log(this.imageUrl);
+        console.info(this.imageUrl);
       } else {
         this.$message.error('上传图片失败！');
       }
     },
     beforeImgUpload(file) {
+      // "jpg,gif,png,bmp"
       const isJPG = file.type === 'image/jpeg';
+      const isPNG = file.type === 'image/png';
       const isLt2M = file.size / 1024 / 1024 < 2;
 
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!');
+      if (isJPG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.jpg';
+      }
+      if (isPNG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.png';
+      }
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
       }
       if (!isLt2M) {
         this.$message.error('上传头像图片大小不能超过 2MB!');
       }
-      console.log(file);
-      return isJPG && isLt2M;
+      return (isJPG || isPNG) && isLt2M;
     },
-    onSubmit() {
-      console.log('submit!');
+    async onSubmit(boolean) {
+      if (boolean) {
+        console.log('确认下单');
+        if (this.imageUrl !== '' && this.selectedGoods.length > 0 && this.sizeForm.name !== '' && this.sizeForm.phone !== '' && this.sizeForm.address !== '') {
+          let res = await send({
+            'phone': this.sizeForm.phone,
+            'type': 1
+          });
+          if (res.code === 0) {
+            this.dialogDegShowOrHide = true;
+            this.$notify.success({
+              title: '验证码已发送请注意查收！',
+              message: ''
+            });
+          } else {
+            this.$notify.error({
+              title: '亲,验证码发送失败！',
+              message: '请核对手机号是否正确'
+            });
+          }
+        } else {
+          this.$notify.error({
+            title: '亲,您信息填写不太完整哦！',
+            message: '请填写完整再确认下单'
+          });
+        }
+      } else {
+        // 取消下单
+        this.toggleSelection(false);
+        this.multipleSelection = [];
+        this.selectedGoods = [];
+      }
     },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
       this.currentPageSize = val;
       this.currentPage = 1;
       this.initData(this.currentPage, this.currentPageSize);
     },
     handleCurrentChange(val) {
-      console.log(`第 ${val} 页`);
       this.initData(val, this.currentPageSize);
       this.currentPage = val;
       this.offset = (val - 1) * this.limit;
-      this.getOrders();
+    },
+    async handleClick(row, index) {
+      let res = await getinfoforgoods(row.goodsId);
+      console.log(res);
+      if (res.code === 0) {
+        this.selectTable = res.data;
+        this.dialogShowOrHide = true;
+      }
+    },
+    onResultChange(val) {
+      this.dialogShowOrHide = val; // 4
+    },
+    onDialogChange(val) {
+      this.dialogShowOrHide = val; // 4
+    },
+    onDialogRegChange(val) {
+      this.dialogDegShowOrHide = val; // 4
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -327,53 +511,53 @@ export default {
           this.multipleSelection.forEach((val, index) => {
             this.selectedGoods.push(val);
           });
+        } else {
+          this.$notify.error({
+            title: '亲,您还没有选择药品哦',
+            message: '请点击表格前面的小方框选择药品'
+          });
         }
       } else {
         this.$refs['multipleTable'].clearSelection();
       }
     },
-    async provincialCity() {
-      const res = await prov();
-      console.log(res);
-      let arr = [];
-      res.data.forEach(function(item, index) {
-        let value = {
-          value: item.name,
-          label: item.name,
-          children: []
-        };
-        item.city.forEach(function(val, i) {
-          let obj = {
-            value: val.name,
-            label: val.name,
-            children: []
-          };
-          val.area.forEach(function(v, m) {
-            let o = {
-              value: v,
-              label: v
-            };
-            obj.children.push(o);
+    deleteRow(scope) {
+      this.selectedGoods = removeForIndex(this.selectedGoods, scope.$index);
+    },
+    clickImg(src) {
+      this.showImg = true;
+      // 获取当前图片地址
+      this.bigImgSrc = src;
+    },
+    viewImg() {
+      this.showImg = false;
+    }
+  },
+  components: {
+    'big-img': BigImg,
+    reg,
+    'detailmodel': detailModel
+  },
+  watch: {
+    selectedGoods: {
+      handler: function(val, oldval) {
+        if (val.length > 0) {
+          let price = 0;
+          val.forEach(value => {
+            price += value.salesPrice * value.thisNum;
           });
-          value.children.push(obj);
-        });
-        arr.push(value);
-      });
-      this.options2 = arr;
+          this.totalPrice = price;
+        } else {
+          this.totalPrice = 0;
+        }
+      },
+      deep: true // 对象内部的属性监听，也叫深度监听
     }
   }
-  // ,
-  // watch: {
-  //   addressSelect(newV, oldV) {
-  //     if (newV || newV === 0) {
-  //       this.sizeForm.address = this.addressList[newV];
-  //     }
-  //   }
-  // }
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .box {
     padding: 20px;
     .el-form {

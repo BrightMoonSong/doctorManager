@@ -33,7 +33,7 @@ export default {
           trigger: 'axis'
         },
         legend: {
-          data: ['API请求量', '新注册用户', '新增订单', '新增管理员']
+          data: ['下单数', '平均每单价格', '收入', '已完成订单']
         },
         toolbox: {
           show: true,
@@ -41,25 +41,29 @@ export default {
             dataZoom: {
               yAxisIndex: 'none'
             },
-            dataView: {
-              readOnly: false
+            // dataView: { // 数据视图
+            //   readOnly: false
+            // },
+            mark: {
+              show: true
             },
             magicType: {
-              type: ['bar', 'line']
+              type: ['bar', 'line']// , 'stack', 'tiled'
+            },
+            saveAsImage: {
+              show: true
             },
             restore: {}
           }
         },
         xAxis: {
           type: 'category',
-          boundaryGap: false,
+          boundaryGap: false, // false从[0]开始向右延伸  true从0开始
           data: this.sevenDay
         },
         yAxis: [{
             type: 'value',
-            name: 'API请求量',
-            min: 0,
-            max: 200000,
+            name: '下单数',
             position: 'left',
             axisLine: {
               lineStyle: {
@@ -72,9 +76,7 @@ export default {
           },
           {
             type: 'value',
-            name: '用户、订单',
-            min: 0,
-            max: 400,
+            name: '收益',
             position: 'right',
             axisLine: {
               lineStyle: {
@@ -87,7 +89,7 @@ export default {
           }
         ],
         series: [{
-            name: 'API请求量',
+            name: '下单数',
             type: 'line',
             data: this.sevenDate[0],
             markPoint: {
@@ -103,7 +105,7 @@ export default {
             }
           },
           {
-            name: '新注册用户',
+            name: '平均每单价格',
             type: 'line',
             data: this.sevenDate[1],
             yAxisIndex: 1,
@@ -120,7 +122,7 @@ export default {
             }
           },
           {
-            name: '新增订单',
+            name: '收入',
             type: 'line',
             data: this.sevenDate[2],
             yAxisIndex: 1,
@@ -137,7 +139,7 @@ export default {
             }
           },
           {
-            name: '新增管理员',
+            name: '已完成订单',
             type: 'line',
             data: this.sevenDate[3],
             yAxisIndex: 1,

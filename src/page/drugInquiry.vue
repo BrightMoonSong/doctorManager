@@ -1,16 +1,15 @@
 <template lang="html">
   <div class="box">
     <div class="el-col el-col-6" style="margin: 15px;">
-      <el-cascader style="width:100%;" placeholder="检索分类" :options="options2" v-model="selectedOptions3"></el-cascader>
+      <el-cascader style="width:100%;" placeholder="检索分类"
+        :options="selectList" v-model="cateIdList"
+        @active-item-change="handleItemChange"
+        :props="props"
+      ></el-cascader>
     </div>
     <div class="el-col el-col-6" style="margin: 15px;">
-      <el-input placeholder="按名称检索" v-model="input5" class="input-with-select">
-        <!-- <el-select v-model="select" clearable slot="prepend" placeholder="请选择">
-          <el-option label="餐厅名" value="1"></el-option>
-          <el-option label="订单号" value="2"></el-option>
-          <el-option label="用户电话" value="3"></el-option>
-        </el-select> -->
-        <el-button slot="append" icon="el-icon-search"></el-button>
+      <el-input placeholder="关键词检索" v-model="parmValue" class="input-with-select">
+        <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
       </el-input>
     </div>
     <el-table
@@ -24,35 +23,35 @@
         show-overflow-tooltip
         align="center">
         <template slot-scope="scope">
-          <img :src="scope.row.src" @click="clickImg(scope.row.src)" alt="..." width="50">
+          <img :src="scope.row.masterImg" @click="clickImg(scope.row.masterImg)" alt="..." width="50">
         </template>
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="name1"
         show-overflow-tooltip
         label="商品名称"
         align="center">
       </el-table-column>
       <el-table-column
-        prop="address"
+        prop="name2"
         align="center"
         show-overflow-tooltip
-        label="商品分类">
+        label="商品简介">
       </el-table-column>
       <el-table-column
-        prop="address"
+        prop="salesPrice"
         align="center"
         show-overflow-tooltip
         label="商品售价">
       </el-table-column>
       <el-table-column
-        prop="address"
+        prop="stock"
         align="center"
         show-overflow-tooltip
         label="商品库存">
       </el-table-column>
       <el-table-column
-        prop="address"
+        prop="specification"
         align="center"
         show-overflow-tooltip
         label="商品规格">
@@ -78,7 +77,9 @@
 
 <script>
 import {
-  prov
+  findinfos,
+  findinfosbypid,
+  getinfoforgoods
 } from '@/api/getData';
 import BigImg from '@/common/BigImg';
 import detailModel from '@/page/popup/detailModel';
@@ -86,25 +87,93 @@ import detailModel from '@/page/popup/detailModel';
 export default {
   data() {
     return {
-      input5: '',
       dialogShowOrHide: false,
       selectTable: [],
       select: '',
       showImg: false,
       bigImgSrc: '',
       tableData: [],
-      options2: [],
-      count: 4,
+      count: 0,
       currentPage: 1,
       currentPageSize: 10,
-      selectedOptions3: []
+      selectList: [],
+      props: {
+        value: 'value',
+        children: 'children'
+      },
+      cateIdList: [],
+      categoryId: '',
+      parmValue: ''
     };
   },
   mounted() {
-    this.provincialCity();
-    this.initData();
+    // 获取三级分类
+    this.findinfosbypid();
+    this.initData(1, 10);
   },
   methods: {
+    search() {
+      if (this.cateIdList.length === 3) {
+        this.categoryId = this.cateIdList[2];
+      }
+      this.initData(1, 10);
+    },
+    async handleItemChange(val) {
+      if (val.length === 3) {
+        return;
+      }
+      let res = await findinfosbypid(val[val.length - 1]);
+      if (val.length === 1) {
+        let index = 0;
+        this.selectList.forEach((v, i) => {
+          if (v.value === val[val.length - 1]) {
+            index = i;
+          }
+        });
+        this.selectList[index].children = [];
+        res.data.forEach(val => {
+          let obj = {
+            value: val.cateId,
+            label: val.cateName,
+            children: []
+          };
+          this.selectList[0].children.push(obj);
+        });
+      } else if (val.length === 2) {
+        let index = 0;
+        let index1 = 0;
+        this.selectList.forEach((v, i) => {
+          if (v.value === val[0]) {
+            index = i;
+          }
+        });
+        this.selectList[index].children.forEach((m, n) => {
+          if (m.value === val[1]) {
+            index1 = n;
+          }
+        });
+        this.selectList[index].children[index1].children = [];
+        res.data.forEach(val => {
+          let obj = {
+            value: val.cateId,
+            label: val.cateName
+          };
+          this.selectList[index].children[index1].children.push(obj);
+        });
+      }
+    },
+    async findinfosbypid() {
+      let res = await findinfosbypid(0);
+      this.selectList = [];
+      res.data.forEach(val => {
+        let obj = {
+          value: val.cateId,
+          label: val.cateName,
+          children: []
+        };
+        this.selectList.push(obj);
+      });
+    },
     clickImg(src) {
       this.showImg = true;
       // 获取当前图片地址
@@ -113,77 +182,33 @@ export default {
     viewImg() {
       this.showImg = false;
     },
-    initData() {
-      console.log('---++++');
-      this.tableData = [{
-        src: 'http://pic.58pic.com/58pic/13/74/51/99d58PIC6vm_1024.jpg',
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        src: 'http://pic.58pic.com/58pic/13/74/51/99d58PIC6vm_1024.jpg',
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        src: 'http://pic.58pic.com/58pic/13/74/51/99d58PIC6vm_1024.jpg',
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        src: 'http://pic.58pic.com/58pic/13/74/51/99d58PIC6vm_1024.jpg',
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }];
+    async initData(pageNo, pageSize) {
+      let res = await findinfos({
+        'pageSize': pageSize,
+        'pageNo': pageNo,
+        'parmValue': this.parmValue,
+        'categoryId': this.categoryId
+      });
+      this.tableData = res.data;
+      this.count = res.totalSize;
     },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
       this.currentPageSize = val;
       this.currentPage = 1;
       this.initData(this.currentPage, this.currentPageSize);
     },
     handleCurrentChange(val) {
-      console.log(`第 ${val} 页`);
       this.initData(val, this.currentPageSize);
       this.currentPage = val;
       this.offset = (val - 1) * this.limit;
-      this.getOrders();
     },
-    async provincialCity() {
-      const res = await prov();
+    async handleClick(row, index) {
+      let res = await getinfoforgoods(row.goodsId);
       console.log(res);
-      let arr = [];
-      res.data.forEach(function(item, index) {
-        let value = {
-          value: item.name,
-          label: item.name,
-          children: []
-        };
-        item.city.forEach(function(val, i) {
-          let obj = {
-            value: val.name,
-            label: val.name,
-            children: []
-          };
-          val.area.forEach(function(v, m) {
-            let o = {
-              value: v,
-              label: v
-            };
-            obj.children.push(o);
-          });
-          value.children.push(obj);
-        });
-        arr.push(value);
-      });
-      this.options2 = arr;
-    },
-    handleClick(row, index) {
-      this.selectTable = row;
-      this.dialogShowOrHide = true;
-      console.log(this.selectTable, this.dialogShowOrHide);
-      console.log(row, index);
+      if (res.code === 0) {
+        this.selectTable = res.data;
+        this.dialogShowOrHide = true;
+      }
     },
     onResultChange(val) {
       this.dialogShowOrHide = val; // 4

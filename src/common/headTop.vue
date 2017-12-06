@@ -43,7 +43,7 @@ export default {
         this.$router.push('/dataManagement');
       } else if (command == 'singout') {
         const res = await signout();
-        if (res.status == 1) {
+        if (res.code === 0) {
           this.$message({
             type: 'success',
             message: '退出成功'
@@ -52,7 +52,7 @@ export default {
         } else {
           this.$message({
             type: 'error',
-            message: res.message
+            message: '服务器忙，请稍后重试'
           });
         }
       }

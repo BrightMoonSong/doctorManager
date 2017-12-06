@@ -1,37 +1,38 @@
 <template>
-<el-dialog title="药品详情" :visible.sync="dialogShowOrHideThis">
+<el-dialog title="药品详情" top="5vh" width="1030px" :visible.sync="dialogShowOrHideThis">
   <el-form :model="selectTable">
-    <el-form-item label="药品名称" label-width="100px">
-      <el-input v-model="selectTable.name"></el-input>
+    <span v-html="selectTable.instruction"></span>
+    <!-- <el-form-item label="药品名称：" label-width="100px">
+      <span v-text="selectTable.name"></span>
     </el-form-item>
-    <el-form-item label="主要成分" label-width="100px">
-      <el-input v-model="selectTable.data" auto-complete="off"></el-input>
+    <el-form-item label="主要成分：" label-width="100px">
+      <span v-text="selectTable.data" auto-complete="off"></span>
     </el-form-item>
-    <el-form-item label="性状" label-width="100px">
+    <el-form-item label="性状：" label-width="100px">
       <img :src="selectTable.src" @click="clickImg(selectTable.src)" class="image" width="100px">
     </el-form-item>
-    <el-form-item label="规格型号" label-width="100px">
-      <el-input v-model="selectTable.address"></el-input>
+    <el-form-item label="规格型号：" label-width="100px">
+      <span v-text="selectTable.address"></span>
     </el-form-item>
-    <el-form-item label="用法用量" label-width="100px">
-      <el-input v-model="selectTable.address"></el-input>
+    <el-form-item label="用法用量：" label-width="100px">
+      <span v-text="selectTable.address"></span>
     </el-form-item>
-    <el-form-item label="不良反应" label-width="100px">
-      <el-input v-model="selectTable.address"></el-input>
+    <el-form-item label="不良反应：" label-width="100px">
+      <span v-text="selectTable.address"></span>
     </el-form-item>
-    <el-form-item label="禁忌" label-width="100px">
-      <el-input v-model="selectTable.address"></el-input>
+    <el-form-item label="禁忌：" label-width="100px">
+      <span v-text="selectTable.address"></span>
     </el-form-item>
-    <el-form-item label="注意事项" label-width="100px">
-      <el-input v-model="selectTable.address"></el-input>
+    <el-form-item label="注意事项：" label-width="100px">
+      <span v-text="selectTable.instruction"></span>
     </el-form-item>
     <el-form-item label-width="100px">
-        <img :src="selectTable.src" @click="clickImg(selectTable.src)" alt="..." width="90">
-    </el-form-item>
+      <img :src="selectTable.src" @click="clickImg(selectTable.src)" alt="..." width="90">
+    </el-form-item> -->
   </el-form>
   <div slot="footer" class="dialog-footer">
-    <el-button @click="dialogShowOrHideThis = false">取 消</el-button>
-    <el-button type="primary" @click="okModel(false)">确 定</el-button>
+    <el-button type="success" size="mini" @click="dialogShowOrHideThis = false">取 消</el-button>
+    <!-- <el-button type="primary" @click="okModel(false)">确 定</el-button> -->
   </div>
   <big-img v-if="showImg" @clickit="viewImg" :imgSrc="bigImgSrc"></big-img>
   <div class="clearfix"></div>
@@ -84,5 +85,9 @@ export default {
 <style lang="scss" scoped>
 .box {
     width: 100%;
+}
+.el-dialog {
+    width: 60%;
+    min-width: 1030px !important;
 }
 </style>

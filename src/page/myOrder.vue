@@ -1,16 +1,10 @@
 <template lang="html">
 <div class="box">
-  <div class="el-col el-col-4" style="margin: 15px;">
-    <el-input v-model="input1" placeholder="按订单号检索"></el-input>
+  <div class="el-col el-col-4" style="padding: 5px;padding-left: 0px;">
+    <el-input v-model="parmValue" placeholder="关键词检索"></el-input>
   </div>
-  <div class="el-col el-col-4" style="margin: 15px;">
-    <el-input v-model="input2" placeholder="按手机号检索"></el-input>
-  </div>
-  <div class="el-col el-col-4" style="margin: 15px;">
-    <el-input v-model="input3" placeholder="按姓名检索"></el-input>
-  </div>
-  <div class="el-col el-col-4" style="margin: 15px;">
-    <el-select v-model="value" clearable placeholder="订单状态">
+  <div class="el-col el-col-4" style="padding: 5px;">
+    <el-select v-model="orderStatus" style="width:100%" clearable placeholder="订单状态">
       <el-option
         v-for="item in options"
         :key="item.value"
@@ -19,9 +13,9 @@
       </el-option>
     </el-select>
   </div>
-  <div class="el-col el-col-8" style="margin: 15px;width:400px;">
+  <div class="el-col el-col-8" style="padding: 5px;width:400px;padding-left: 0px;">
     <el-date-picker
-      v-model="value4"
+      v-model="datePicker"
       type="datetimerange"
       :picker-options="pickerOptions2"
       range-separator="至"
@@ -30,8 +24,8 @@
       align="right">
     </el-date-picker>
   </div>
-  <div class="el-col el-col-4" style="margin: 15px;">
-    <el-button type="primary" plain>查询</el-button>
+  <div class="el-col el-col-4" style="padding: 5px;width: 168px;">
+    <el-button type="primary" plain @click="searchList">查询</el-button>
     <el-button type="primary" @click="pageJump" plain>下单</el-button>
   </div>
   <el-table
@@ -40,19 +34,19 @@
     border
     style="width: 100%;">
     <el-table-column
-      prop="date"
+      prop="orderNo"
       label="订单号"
       align="center"
       show-overflow-tooltip>
     </el-table-column>
     <el-table-column
-      prop="name"
-      label="订单姓名"
+      prop="userName"
+      label="用户名称"
       show-overflow-tooltip
       align="center">
     </el-table-column>
     <el-table-column
-      prop="address"
+      prop="deliveryPhone"
       align="center"
       show-overflow-tooltip
       label="订单手机号">
@@ -87,12 +81,11 @@
       align="center"
       width="100">
       <template slot-scope="scope">
-        <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-        <el-button type="text" size="small">编辑</el-button>
+        <el-button @click="ordersdetailbyid(scope.row)" type="text" size="small">查看</el-button>
       </template>
     </el-table-column>
   </el-table>
-  <div class="Pagination" style="text-align: left;margin-top: 10px;">
+  <div class="Pagination" style="text-align: left;margin-top: 10px;" v-show="count>0">
     <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[5, 10, 20, 30, 40]" :page-size="currentPageSize" layout="total, sizes, prev, pager, next, jumper" :total="count">
     </el-pagination>
   </div>
@@ -100,49 +93,36 @@
 </template>
 
 <script>
+import {
+  ordersfindinfos,
+  ordersdetailbyid
+} from '@/api/getData';
+import {
+  getStore
+} from '@/config/mUtils';
+
 export default {
   data() {
     return {
-      input1: '',
-      count: 20,
-      input2: '',
-      input3: '',
+      parmValue: '',
+      count: 0,
       currentPage: 1,
       currentPageSize: 10,
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }],
+      tableData: [],
       options: [{
         value: '1',
-        label: '交通银行'
+        label: '待审核'
       }, {
         value: '2',
-        label: '工商银行'
+        label: '待完成'
       }, {
         value: '3',
-        label: '建设银行'
+        label: '已完成'
       }, {
         value: '4',
-        label: '中国银行'
-      }, {
-        value: '5',
-        label: '北京银行'
+        label: '无效'
       }],
-      value: '5',
+      orderStatus: '',
       pickerOptions2: {
         shortcuts: [{
           text: '最近一周',
@@ -170,57 +150,45 @@ export default {
           }
         }]
       },
-      value4: ''
+      datePicker: ''
     };
   },
+  mounted() {
+    this.initData(1, 10);
+  },
   methods: {
-    // async 表示函数里有异步操作，await 表示紧跟在后面的表达式需要等待结果。
+    async ordersdetailbyid(row) {
+      let res = await ordersdetailbyid(row.orderId);
+      console.log(res);
+    },
+    searchList() {
+      this.initData(this.currentPage, this.currentPageSize);
+    },
     async initData(pageNo, pageSize) {
-      try {
-        // mapi/carmodel/carmodels
-        // /mapi/log/find?pageNo=1&pageSize=10&userToken=6c542f95393&formToken=ea1323e9-d1f5949&funcId=559
-        // const countData = await this.$http.get('/mapi/log/find?pageNo=' + pageNo + '&pageSize=' + pageSize).then((response) => {
-        //   response = response.body;
-        //   return response;
-        // });
-        const countData = await this.$http.get('/mapi/carmodel/carmodels?pageNo=' + pageNo + '&pageSize=' + pageSize).then((response) => {
-          response = response.body;
-          return response;
-        });
-        this.city = {
-          'name': '北京',
-          'id': '1'
-        };
-        if (countData.code === 0) {
-          this.Orders = countData.data;
-          this.count = countData.totalSize;
-        } else {
-          throw new Error('获取数据失败');
-        }
-        this.getOrders();
-      } catch (err) {
-        console.log('获取数据失败', err);
+      let res = await ordersfindinfos({
+        'pageSize': pageSize,
+        'pageNo': pageNo,
+        'parmValue': this.parmValue,
+        'userId': getStore('userId'),
+        'orderStatus': this.orderStatus,
+        'datePicker': this.datePicker
+      });
+      console.log(res);
+      console.log(this.datePicker);
+      if (res.code === 0) {
+        this.tableData = res.data;
+        this.count = res.totalSize;
       }
     },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
       this.currentPageSize = val;
       this.currentPage = 1;
       this.initData(this.currentPage, this.currentPageSize);
     },
     handleCurrentChange(val) {
-      console.log(`第 ${val} 页`);
       this.initData(val, this.currentPageSize);
       this.currentPage = val;
       this.offset = (val - 1) * this.limit;
-      this.getOrders();
-    },
-    async getOrders() {
-      this.tableData.push({
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      });
     },
     pageJump() {
       this.$router.push('onlineSingleOrder');

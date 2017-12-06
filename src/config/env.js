@@ -8,12 +8,13 @@
  */
 let baseUrl = '';
 let routerMode = 'history';
-let baseImgPath = 'http://images.cangdu.org/';
+// let baseImgPath = 'http://images.cangdu.org/';
+let baseImgPath = 'https://zhydl.oss-cn-beijing.aliyuncs.com/';
 
 if (process.env.NODE_ENV == 'development') {
-  // baseUrl = 'http://cangdu.org:8001';
+
 } else {
-  baseUrl = 'http://cangdu.org:8001';
+  // baseUrl = 'http://cangdu.org:8001';
 }
 
 export {

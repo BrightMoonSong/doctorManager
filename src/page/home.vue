@@ -1,43 +1,30 @@
 <template>
 <div>
+  <!-- <div v-drag>我可以拖拽</div> -->
+  <!-- <img width="100" v-bigimg="'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1512122556735&di=7b15c09607c2afd33ddeb0a2bfbbc8b1&imgtype=0&src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fc995d143ad4bd113c251b84c58afa40f4bfb052b.jpg'"
+  v-lodimg="'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1512122556735&di=7b15c09607c2afd33ddeb0a2bfbbc8b1&imgtype=0&src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fc995d143ad4bd113c251b84c58afa40f4bfb052b.jpg'"
+  /> -->
   <!-- <head-top></head-top> -->
   <section class="data_section">
-    <header class="section_title">数据统计</header>
+    <header class="section_title">收益统计<small class="small-my">注：只有已完成订单计算收益</small></header>
     <el-row :gutter="20" style="margin-bottom: 10px;">
-      <el-col :span="5">
-        <div class="data_list today_head"><span class="data_num head">当日数据：</span></div>
-      </el-col>
-      <el-col :span="5">
-        <div class="data_list"><span class="data_num">{{apiCount}}</span> API请求量</div>
+      <el-col :span="4">
+        <div class="data_list today_head"><span class="data_num head">订单状态：</span></div>
       </el-col>
       <el-col :span="4">
-        <div class="data_list"><span class="data_num">{{userCount}}</span> 新增用户</div>
+        <div class="data_list">总订单数<span class="data_num">{{objCount.allOrder}}</span></div>
       </el-col>
       <el-col :span="4">
-        <div class="data_list"><span class="data_num">{{orderCount}}</span> 新增订单</div>
+        <div class="data_list">待审核订单<span class="data_num">{{objCount.toBeAuditedOrder}}</span></div>
       </el-col>
       <el-col :span="4">
-        <div class="data_list"><span class="data_num">{{adminCount}}</span> 新增管理员</div>
-      </el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :span="5">
-        <div class="data_list all_head"><span class="data_num head">总数据：</span></div>
-      </el-col>
-      <el-col :span="5">
-        <div class="data_list">
-          <span class="data_num">{{allApi}}<span class="wan" v-if="allApiCount > 10000">万</span>
-          </span> API请求量
-        </div>
+        <div class="data_list">待完成订单<span class="data_num">{{objCount.toBeCompletedOrder}}</span></div>
       </el-col>
       <el-col :span="4">
-        <div class="data_list"><span class="data_num">{{allUserCount}}</span> 注册用户</div>
+        <div class="data_list">已完成订单<span class="data_num">{{objCount.completedOrder}}</span></div>
       </el-col>
       <el-col :span="4">
-        <div class="data_list"><span class="data_num">{{allOrderCount}}</span> 订单</div>
-      </el-col>
-      <el-col :span="4">
-        <div class="data_list"><span class="data_num">{{allAdminCount}}</span> 管理员</div>
+        <div class="data_list">无效订单<span class="data_num">{{objCount.invalidOrder}}</span></div>
       </el-col>
     </el-row>
   </section>
@@ -49,27 +36,11 @@
 // import headTop from '../common/headTop';
 import tendency from '../common/tendency';
 import dtime from 'time-formater';
-import {
-  apiCount,
-  userCount,
-  orderCount,
-  apiAllCount,
-  getUserCount,
-  getOrderCount,
-  adminDayCount,
-  adminCount
-} from '@/api/getData';
+
 export default {
   data() {
     return {
-      apiCount: null,
-      userCount: null,
-      orderCount: null,
-      adminCount: null,
-      allApiCount: null,
-      allUserCount: null,
-      allOrderCount: null,
-      allAdminCount: null,
+      objCount: {},
       sevenDay: [],
       sevenDate: [
         [],
@@ -84,66 +55,28 @@ export default {
     tendency
   },
   mounted() {
-    this.initData();
+    this.objCount = {
+      'allOrder': 100,
+      'toBeAuditedOrder': 5,
+      'toBeCompletedOrder': 20,
+      'completedOrder': 70,
+      'invalidOrder': 5
+    };
+    // 获取数据
+    this.sevenDate = [
+      [11, 22, 33, 44, 55, 66, 77],
+      [77, 88, 99, 111, 121, 131, 141],
+      [12, 24, 34, 45, 56, 67, 78],
+      [10, 30, 40, 50, 60, 70, 80]
+    ];
     for (let i = 6; i > -1; i--) {
       const date = dtime(new Date().getTime() - 86400000 * i).format('YYYY-MM-DD');
       this.sevenDay.push(date);
     }
-    this.getSevenData();
-  },
-  computed: {
-    allApi: function() {
-      return this.allApiCount < 10000 ? this.allApiCount : (this.allApiCount / 10000).toFixed(2);
-    }
+    // this.sevenDay = ['2017-11-20', '2017-11-24', '2017-11-25', '2017-11-26', '2017-11-27', '2017-11-28', '2017-11-29']
   },
   methods: {
-    async initData() {
-      const today = dtime().format('YYYY-MM-DD');
-      Promise.all([apiCount(today), userCount(today), orderCount(today), adminDayCount(today), apiAllCount(), getUserCount(), getOrderCount(), adminCount()])
-        .then(res => {
-          this.apiCount = res[0].count;
-          this.userCount = res[1].count;
-          this.orderCount = res[2].count;
-          this.adminCount = res[3].count;
-          this.allApiCount = res[4].count;
-          this.allUserCount = res[5].count;
-          this.allOrderCount = res[6].count;
-          this.allAdminCount = res[7].count;
-        }).catch(err => {
-          console.log(err);
-        });
-    },
-    async getSevenData() {
-      const apiArr = [
-        [],
-        [],
-        [],
-        []
-      ];
-      this.sevenDay.forEach(item => {
-        apiArr[0].push(apiCount(item));
-        apiArr[1].push(userCount(item));
-        apiArr[2].push(orderCount(item));
-        apiArr[3].push(adminDayCount(item));
-      });
-      const promiseArr = [...apiArr[0], ...apiArr[1], ...apiArr[2], ...apiArr[3]];
-      Promise.all(promiseArr).then(res => {
-        const resArr = [
-          [],
-          [],
-          [],
-          []
-        ];
-        res.forEach((item, index) => {
-          if (item.status == 1) {
-            resArr[Math.floor(index / 7)].push(item.count);
-          }
-        });
-        this.sevenDate = resArr;
-      }).catch(err => {
-        console.log(err);
-      });
-    }
+
   }
 };
 </script>
@@ -185,5 +118,10 @@ export default {
 }
 .wan {
     .sc(16px, #333)
+}
+.small-my {
+    font-size: 12px;
+    font-weight: 400;
+    color: #afaeae;
 }
 </style>

@@ -1,15 +1,15 @@
 <template lang="html">
 <div class="box">
-  <div class="el-col el-col-4" style="margin: 15px;">
+  <div class="el-col el-col-4" style="padding: 5px;padding-left: 0px;">
     <el-input v-model="input1" placeholder="按订单号检索"></el-input>
   </div>
-  <div class="el-col el-col-4" style="margin: 15px;">
+  <div class="el-col el-col-4" style="padding: 5px;">
     <el-input v-model="input2" placeholder="按手机号检索"></el-input>
   </div>
-  <div class="el-col el-col-4" style="margin: 15px;">
+  <div class="el-col el-col-4" style="padding: 5px;">
     <el-input v-model="input3" placeholder="按姓名检索"></el-input>
   </div>
-  <div class="el-col el-col-4" style="margin: 15px;">
+  <div class="el-col el-col-4" style="padding: 5px;">
     <el-select v-model="value" clearable placeholder="订单状态">
       <el-option
         v-for="item in options"
@@ -19,7 +19,7 @@
       </el-option>
     </el-select>
   </div>
-  <div class="el-col el-col-8" style="margin: 15px;width:400px;">
+  <div class="el-col el-col-8" style="padding: 5px;padding-left: 0px;width:400px;">
     <el-date-picker
       v-model="value4"
       type="datetimerange"
@@ -30,7 +30,7 @@
       align="right">
     </el-date-picker>
   </div>
-  <div class="el-col el-col-4" style="margin: 15px;">
+  <div class="el-col el-col-4" style="padding: 5px;width:72px;">
     <el-button type="primary" plain>查询</el-button>
   </div>
   <el-table
@@ -42,36 +42,43 @@
       prop="date"
       label="订单号"
       align="center"
+      show-overflow-tooltip
       width="180">
     </el-table-column>
     <el-table-column
       prop="name"
       label="订单姓名"
+      show-overflow-tooltip
       align="center">
     </el-table-column>
     <el-table-column
       prop="address"
       align="center"
+      show-overflow-tooltip
       label="订单手机号">
     </el-table-column>
     <el-table-column
       prop="address"
+      show-overflow-tooltip
       align="center"
       label="下单时间">
     </el-table-column>
     <el-table-column
       prop="address"
       align="center"
+      show-overflow-tooltip
       label="订单状态">
     </el-table-column>
     <el-table-column
       prop="address"
       align="center"
+      show-overflow-tooltip
       label="订单金额">
     </el-table-column>
     <el-table-column
       prop="address"
       align="center"
+      show-overflow-tooltip
       label="佣金">
     </el-table-column>
     <el-table-column
@@ -81,7 +88,6 @@
       width="100">
       <template slot-scope="scope">
         <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-        <el-button type="text" size="small">编辑</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -222,5 +228,8 @@ export default {
 <style lang="scss" scoped>
 .box {
     padding: 20px;
+}
+.el-select {
+    width: 100%;
 }
 </style>

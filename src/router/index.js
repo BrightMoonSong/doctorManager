@@ -4,7 +4,7 @@ import Router from 'vue-router';
 
 const login = r => require.ensure([], () => r(require('@/page/login')), 'login');
 const manage = r => require.ensure([], () => r(require('@/page/manage')), 'manage');
-// const home = r => require.ensure([], () => r(require('@/page/home')), 'home');
+const home = r => require.ensure([], () => r(require('@/page/home')), 'home');
 // const uploadImg = r => require.ensure([], () => r(require('@/page/uploadImg')), 'uploadImg');
 
 const dataManagement = r => require.ensure([], () => r(require('@/page/dataManagement')), 'dataManagement');
@@ -14,6 +14,7 @@ const myOrder = r => require.ensure([], () => r(require('@/page/myOrder')), 'myO
 const onlineSingleOrder = r => require.ensure([], () => r(require('@/page/onlineSingleOrder')), 'onlineSingleOrder');
 const myIncome = r => require.ensure([], () => r(require('@/page/myIncome')), 'myIncome');
 const test = r => require.ensure([], () => r(require('@/page/test')), 'test');
+const trans = r => require.ensure([], () => r(require('@/page/transitionTest')), 'trans');
 
 Vue.use(Router);
 
@@ -28,12 +29,12 @@ export default new Router({
     path: '/manage',
     component: manage,
     name: '',
-    children: [
-      //   {
-      //   path: '',
-      //   component: home,
-      //   meta: []
-      // }, {
+    children: [{
+        path: '',
+        component: home,
+        meta: []
+      },
+      //  {
       //   path: '/uploadImg',
       //   component: uploadImg,
       //   meta: ['文本编辑', 'MarkDown']
@@ -66,6 +67,10 @@ export default new Router({
         path: '/test',
         component: test,
         meta: ['test']
+      }, {
+        path: '/trans',
+        component: trans,
+        meta: ['trans']
       }
     ]
   }]

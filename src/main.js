@@ -10,14 +10,19 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
 import store from './store/store';
-
+import drag from '@/config/drag.js';
+import lodimg from '@/config/lodimg.js';
+import bigimg from '@/config/bigimg.js';
+Vue.directive('drag', drag);
+Vue.directive('lodimg', lodimg);
+Vue.directive('bigimg', bigimg);
 // Vue.use(Kiko);
 Vue.use(ElementUI);
 
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
-new Vue({
+window.vm = new Vue({
   el: '#app',
   router,
   store, // 使用store

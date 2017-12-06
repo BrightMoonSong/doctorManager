@@ -5,20 +5,18 @@
       <div class="manage_tip">
         <p>doctor管理系统</p>
       </div>
-      <el-form :model="loginForm" :rules="rules" ref="loginForm">
+      <el-form :model="loginForm" :class="[rotate360]" :rules="rules" ref="loginForm">
         <el-form-item prop="username">
-          <el-input v-model.number="loginForm.username" placeholder="用户名"><span>dsfsf</span></el-input>
+          <el-input v-model="loginForm.username" :placeholder="placeholder[0]"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input type="password" placeholder="密码" v-model="loginForm.password" @keyup.enter.native="submitForm('loginForm')"></el-input>
+          <el-input type="password" :placeholder="placeholder[1]" v-model="loginForm.password" @keyup.enter.native="submitForm('loginForm')"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('loginForm')" class="submit_btn">登陆</el-button>
+          <el-button type="primary" @click="submitForm('loginForm')" class="submit_btn" v-text="submitText">登陆</el-button>
         </el-form-item>
       </el-form>
-      <p class="tip">温馨提示：</p>
-      <p class="tip">未登录过的新用户，自动注册</p>
-      <p class="tip">注册过的用户可凭账号密码登录</p>
+      <p class="tip"><a class="forget-the-password" v-show="buttonBottom[0]"><i class="el-icon-arrow-left"></i>{{buttonBottom[0]}}</a><a class="register" @click="register" v-show="buttonBottom[1]">{{buttonBottom[1]}}<i class="el-icon-arrow-right"></i></a></p>
     </section>
   </transition>
 </div>
@@ -36,25 +34,27 @@ import {
   mapActions,
   mapState
 } from 'vuex';
+import {
+  setStore
+} from '@/config/mUtils';
 
 export default {
   data() {
     return {
+      placeholder: ['用户名', '密码'],
+      buttonBottom: ['忘记密码', '注册'],
+      submitText: '登陆',
+      rotate360: '',
       loginForm: {
         username: '',
         password: ''
       },
       rules: {
         username: [{
-            required: true,
-            message: '请输入用户名',
-            trigger: 'blur'
-          },
-          {
-            type: 'string',
-            message: '用户名必须为string'
-          }
-        ],
+          required: true,
+          message: '请输入用户名',
+          trigger: 'blur'
+        }],
         password: [{
           required: true,
           message: '请输入密码',
@@ -83,23 +83,24 @@ export default {
     async submitForm(formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          // const res = await login({
-          //   user_name: this.loginForm.username,
-          //   password: this.loginForm.password
-          // });
-          const res = await prov();
+          const res = await login({
+            phone: this.loginForm.username,
+            password: this.loginForm.password
+          });
           console.log(res);
-          if (res.errno === 0) {
+          if (res.code === 0) {
             this.$message({
               type: 'success',
               message: '登录成功'
             });
+            setStore('headImg', res.data.headImg);
+            setStore('userToken', res.data.userToken);
+            setStore('userId', res.data.doctorId);
             this.$router.push('manage');
           } else {
-            res.message = '出错了！';
             this.$message({
               type: 'error',
-              message: res.message
+              message: '出错了'
             });
           }
         } else {
@@ -111,6 +112,32 @@ export default {
           return false;
         }
       });
+    },
+    register() {
+      this.rotate360 = 'rotate360';
+      setTimeout(() => {
+        this.rotate360 = '';
+      }, 1000);
+      setTimeout(() => {
+        this.placeholder = ['手机号', '验证码'];
+        this.buttonBottom = ['去登陆', ''];
+        this.submitTextFun(1);
+      }, 500);
+    },
+    submitTextFun(n) {
+      switch (n) {
+        case 1:
+          this.submitText = '注册';
+          break;
+        case 2:
+          this.submitText = '登陆';
+          break;
+        case 3:
+          this.submitText = '提交';
+          break;
+        default:
+          this.submitText = '登陆';
+      }
     }
   },
   watch: {
@@ -173,5 +200,27 @@ export default {
 .form-fade-leave-active {
     transform: translate3d(0, -50px, 0);
     opacity: 0;
+}
+.forget-the-password {
+    float: left;
+    color: #ccc;
+    cursor: pointer;
+    &:hover {
+        color: #090c0a;
+    }
+}
+.register {
+    float: right;
+    color: #ccc;
+    cursor: pointer;
+    &:hover {
+        color: #090c0a;
+    }
+}
+
+.rotate360 {
+    // transform: rotate(360deg);
+    transform: rotate3d(0,1,0,360deg);
+    transition: transform 0.8s ease-in-out;
 }
 </style>

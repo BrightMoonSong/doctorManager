@@ -1,206 +1,138 @@
 <template>
 <div>
-  <div class="fillcontain">
-    <header class="admin_title">个人信息</header>
-    <div class="admin_set">
-      <el-tabs tab-position="top">
-        <el-tab-pane label="基本信息">
-          <ul>
-            <li>
-              <span>姓名：</span>
-              <el-input style="width:50%;" v-model="adminInfo.userName" :disabled="editStart" placeholder="请输入姓名"></el-input>
-            </li>
-            <li>
-              <span>类型：</span>
-              <el-input style="width:50%;" v-model="adminInfo.type" :disabled="editStart" placeholder="请输入类型"></el-input>
-            </li>
-            <li>
-              <span>性别：</span>
-              <el-radio v-model="adminInfo.sex" :disabled="editStart" label="1">男</el-radio>
-              <el-radio v-model="adminInfo.sex" :disabled="editStart" label="2">女</el-radio>
-            </li>
-            <li>
-              <span>出生日期：</span>
-              <el-date-picker v-model="adminInfo.birthday" :disabled="editStart" type="date" :picker-options="pickerOptions1" placeholder="选择出生日期">
-              </el-date-picker>
-            </li>
-            <li class="headerImg">
-              <span style="vertical-align: top;">头像：</span>
-              <el-upload class="avatar-uploader inline-this" :action="baseUrl + '/admin/update/avatar/' + adminInfo.id" :show-file-list="false" :disabled="editStart" :on-success="uploadImg" :limit="1" :before-upload="beforeImgUpload">
-                <img v-if="adminInfo.avatar" :src="baseImgPath + adminInfo.avatar" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload>
-            </li>
-          </ul>
-        </el-tab-pane>
-        <el-tab-pane label="联系方式">
-          <ul>
-            <li>
-              <span>手机：</span>
-              <el-input style="width:50%;" v-model="adminInfo.phone1" :disabled="editStart" placeholder="请输入手机号码"></el-input>
-            </li>
-            <li>
-              <span>座机：</span>
-              <el-input style="width:50%;" v-model="adminInfo.phone2" :disabled="editStart" placeholder="请输入座机号码"></el-input>
-            </li>
-            <li>
-              <span>详细地址：</span>
-              <el-input style="width:50%;" v-model="adminInfo.adress" :disabled="editStart" placeholder="请输入详细地址"></el-input>
-            </li>
-            <li>
-              <span>所属服务机构：</span>
-              <el-input style="width:50%;" v-model="adminInfo.serviceMechanism" :disabled="editStart" placeholder="请输入所属服务机构"></el-input>
-            </li>
-          </ul>
-        </el-tab-pane>
-        <el-tab-pane label="证件信息">
-          <ul>
-            <li class="el-col el-col-8">
-              <span>乡村医生证：</span>
-              <el-upload class="avatar-uploader" :action="baseUrl + '/admin/update/avatar/' + adminInfo.id" :show-file-list="false" :disabled="editStart" :on-success="uploadImg" :limit="1" :before-upload="beforeImgUpload">
-                <img v-if="adminInfo.avatar" :src="baseImgPath + adminInfo.avatar" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload>
-            </li>
-            <li class="el-col el-col-8">
-              <span>健康证：</span>
-              <el-upload class="avatar-uploader" :action="baseUrl + '/admin/update/avatar/' + adminInfo.id" :show-file-list="false" :disabled="editStart" :on-success="uploadImg" :limit="1" :before-upload="beforeImgUpload">
-                <img v-if="adminInfo.avatar" :src="baseImgPath + adminInfo.avatar" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload>
-            </li>
-            <li class="el-col el-col-8">
-              <span>健康证：</span>
-              <el-upload class="avatar-uploader" :action="baseUrl + '/admin/update/avatar/' + adminInfo.id" :show-file-list="false" :disabled="editStart" :on-success="uploadImg" :limit="1" :before-upload="beforeImgUpload">
-                <img v-if="adminInfo.avatar" :src="baseImgPath + adminInfo.avatar" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload>
-            </li>
-            <li style="clear:both;padding: 0;"></li>
-          </ul>
-        </el-tab-pane>
-        <el-tab-pane label="结算信息">
-          <ul>
-            <li>
-              <span>开户银行：</span>
-              <el-select v-model="value8" :disabled="editStart" filterable placeholder="请选择">
-                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                </el-option>
-              </el-select>
-            </li>
-            <li>
-              <span>开户地址：</span>
-              <el-cascader :options="options2" :disabled="editStart" v-model="selectedOptions3"></el-cascader>
-            </li>
-            <li>
-              <span>支行名称：</span>
-              <el-autocomplete class="inline-input" :disabled="editStart" v-model="state2" :fetch-suggestions="querySearch" placeholder="请输入支行名称" :trigger-on-focus="false" @select="handleSelect" style="min-width: 204px;"></el-autocomplete>
-            </li>
-            <li>
-              <span>银行账号：</span>
-              <el-input style="width:55%;" v-model="input" :disabled="editStart" placeholder="请输入银行账号"></el-input>
-            </li>
-          </ul>
-        </el-tab-pane>
-      </el-tabs>
-      <!-- <h4>基本信息：</h4>
-      <ul>
-        <li>
-          <span>姓名：</span><span>{{adminInfo.user_name}}</span>
-        </li>
-        <li>
-          <span>类型：</span><span>{{adminInfo.create_time}}</span>
-        </li>
-        <li>
-          <span>性别：</span><span>{{adminInfo.admin}}</span>
-        </li>
-        <li>
-          <span>出生日期：</span><span>{{adminInfo.id}}</span>
-        </li>
-        <li class="headerImg">
-          <span style="vertical-align: top;">头像：</span>
-          <el-upload class="avatar-uploader inline-this" :action="baseUrl + '/admin/update/avatar/' + adminInfo.id" :show-file-list="false" :on-success="uploadImg" :before-upload="beforeImgUpload">
-            <img v-if="adminInfo.avatar" :src="baseImgPath + adminInfo.avatar" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-        </li>
-      </ul>
-      <h4>联系方式：</h4>
-      <ul>
-        <li>
-          <span>手机：</span><span>{{adminInfo.user_name}}</span>
-        </li>
-        <li>
-          <span>座机：</span><span>{{adminInfo.create_time}}</span>
-        </li>
-        <li>
-          <span>详细地址：</span><span>{{adminInfo.admin}}</span>
-        </li>
-        <li>
-          <span>所属服务机构：</span><span>{{adminInfo.id}}</span>
-        </li>
-      </ul>
-      <h4>证件信息：</h4>
-      <ul>
-        <li class="el-col el-col-8">
-          <span>乡村医生证：</span>
-          <el-upload class="avatar-uploader" :action="baseUrl + '/admin/update/avatar/' + adminInfo.id" :show-file-list="false" :on-success="uploadImg" :before-upload="beforeImgUpload">
-            <img v-if="adminInfo.avatar" :src="baseImgPath + adminInfo.avatar" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-        </li>
-        <li class="el-col el-col-8">
-          <span>健康证：</span>
-          <el-upload class="avatar-uploader" :action="baseUrl + '/admin/update/avatar/' + adminInfo.id" :show-file-list="false" :on-success="uploadImg" :before-upload="beforeImgUpload">
-            <img v-if="adminInfo.avatar" :src="baseImgPath + adminInfo.avatar" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-        </li>
-        <li class="el-col el-col-8">
-          <span>健康证：</span>
-          <el-upload class="avatar-uploader" :action="baseUrl + '/admin/update/avatar/' + adminInfo.id" :show-file-list="false" :on-success="uploadImg" :before-upload="beforeImgUpload">
-            <img v-if="adminInfo.avatar" :src="baseImgPath + adminInfo.avatar" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-        </li>
-        <li style="clear:both;padding: 0;"></li>
-      </ul> -->
+  <div>
+    <div class="fillcontain">
+      <header class="admin_title">个人信息</header>
+      <div class="admin_set">
+        <el-tabs tab-position="top">
+          <el-tab-pane label="基本信息">
+            <ul>
+              <li>
+                <span>姓名：</span>
+                <el-input style="width:50%;" v-model="dataInfo.doctorName" :disabled="editStart" placeholder="请输入姓名"></el-input>
+              </li>
+              <li>
+                <span>类型：</span>
+                <el-input style="width:50%;" v-model="dataInfo.type" :disabled="editStart" placeholder="请输入类型"></el-input>
+              </li>
+              <li>
+                <span>性别：</span>
+                <el-radio v-model="dataInfo.gender" :disabled="editStart" label="1">男</el-radio>
+                <el-radio v-model="dataInfo.gender" :disabled="editStart" label="2">女</el-radio>
+              </li>
+              <li>
+                <span>出生日期：</span>
+                <el-date-picker v-model="dataInfo.birthday" :disabled="editStart" type="date" :picker-options="pickerOptions1" placeholder="选择出生日期">
+                </el-date-picker>
+              </li>
+              <li>
+                <span>所在地区：</span>
+                <el-cascader :options="options2" :disabled="editStart" v-model="basicProCityDistrict"></el-cascader>
+              </li>
+              <li class="headerImg">
+                <span style="vertical-align: top;">头像：</span>
+                <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg" :before-upload="beforeImgUpload">
+                  <img v-if="dataInfo.headImg" :src="dataInfo.headImg" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+              </li>
+            </ul>
+          </el-tab-pane>
+          <el-tab-pane label="联系方式">
+            <ul>
+              <li>
+                <span>手机：</span>
+                <el-input style="width:50%;" v-model="dataInfo.phone" :disabled="editStart" placeholder="请输入手机号码"></el-input>
+              </li>
+              <li>
+                <span>座机：</span>
+                <el-input style="width:50%;" v-model="dataInfo.telPhone" :disabled="editStart" placeholder="请输入座机号码"></el-input>
+              </li>
+              <li>
+                <span>详细地址：</span>
+                <el-input style="width:50%;" v-model="dataInfo.addressDetail" :disabled="editStart" placeholder="请输入详细地址"></el-input>
+              </li>
+              <li>
+                <span>所属服务机构：</span>
+                <el-input style="width:50%;" v-model="dataInfo.serviceAgencies" :disabled="editStart" placeholder="请输入所属服务机构"></el-input>
+              </li>
+            </ul>
+          </el-tab-pane>
+          <el-tab-pane label="证件信息">
+            <ul>
+              <li class="el-col el-col-8">
+                <span>医师资格证：</span>
+                <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg1" :before-upload="beforeImgUpload">
+                  <img v-if="imgUrl1" :src="imgUrl1" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+              </li>
+              <li class="el-col el-col-8">
+                <span>执业医师证：</span>
+                <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg2" :before-upload="beforeImgUpload">
+                  <img v-if="imgUrl2" :src="imgUrl2" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+              </li>
+              <li class="el-col el-col-8">
+                <span>健康证：</span>
+                <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg3" :before-upload="beforeImgUpload">
+                  <img v-if="imgUrl3" :src="imgUrl3" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+              </li>
+              <li style="clear:both;padding: 0;"></li>
+            </ul>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
     </div>
+    <el-row :gutter="20" style="margin-top: 10px;margin-bottom: 10px;">
+      <el-col :span="4" :offset="10" style="min-width:270px;">
+        <el-button type="primary" v-show="editStart" @click="editStates(1)" plain>修改信息</el-button>
+        <el-button type="primary" v-show="dataInfoShow" @click="editStates(4)" plain>审核中信息</el-button>
+        <el-button type="primary" v-show="dataInfoShow1" @click="editStates(4)" plain>审核未通过</el-button>
+        <el-button type="primary" v-show="!editStart" @click="editStates(2)" plain>提交</el-button>
+        <el-button type="primary" v-show="!editStart" @click="editStates(3)" plain>取消</el-button>
+      </el-col>
+    </el-row>
+    <detailmodel :dialogShowOrHide="dialogShowOrHide" :selectTable="checkInfo" @myevent="onResultChange" @dialog="onDialogChange"></detailmodel>
   </div>
-  <!-- <div class="fillcontain">
-    <header class="admin_title">结算信息</header>
-    <div class="admin_set">
-      <ul>
-        <li>
-          <span>开户银行：</span>
-          <el-select v-model="value8" filterable placeholder="请选择">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-        </li>
-        <li>
-          <span>开户地址：</span>
-          <el-cascader :options="options2" v-model="selectedOptions3"></el-cascader>
-        </li>
-        <li>
-          <span>支行名称：</span>
-          <el-autocomplete class="inline-input" v-model="state2" :fetch-suggestions="querySearch" placeholder="请输入支行名称" :trigger-on-focus="false" @select="handleSelect"></el-autocomplete>
-        </li>
-        <li>
-          <span>银行账号：</span>
-          <el-input style="width:55%;" v-model="input" placeholder="请输入银行账号"></el-input>
-        </li>
-      </ul>
+  <div>
+    <div class="fillcontain">
+      <header class="admin_title">结算信息</header>
+      <div class="admin_set">
+        <ul>
+          <li>
+            <span>开户银行：</span>
+            <el-select v-model="value8" :disabled="editStart1" filterable placeholder="请选择">
+              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </li>
+          <li>
+            <span>开户地址：</span>
+            <el-cascader :options="options2" :disabled="editStart1" v-model="selectedOptions3"></el-cascader>
+          </li>
+          <li>
+            <span>支行名称：</span>
+            <el-autocomplete class="inline-input" :disabled="editStart1" v-model="state2" :fetch-suggestions="querySearch" placeholder="请输入支行名称" :trigger-on-focus="false" @select="handleSelect" style="min-width: 204px;"></el-autocomplete>
+          </li>
+          <li>
+            <span>银行账号：</span>
+            <el-input style="width:55%;" v-model="input" :disabled="editStart1" placeholder="请输入银行账号"></el-input>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div> -->
-  <el-row :gutter="20" style="margin-top: 10px;margin-bottom: 10px;">
-    <el-col :span="4" :offset="10" style="min-width:200px;">
-      <el-button type="primary" v-show="editStart" @click="editStates(1)" plain>修改信息</el-button>
-      <el-button type="primary" v-show="!editStart" @click="editStates(2)" plain>提交</el-button>
-      <el-button type="primary" v-show="!editStart" @click="editStates(3)" plain>取消</el-button>
-    </el-col>
-  </el-row>
-
+    <el-row :gutter="20" style="margin-top: 10px;margin-bottom: 10px;">
+      <el-col :span="4" :offset="10" style="min-width:270px;">
+        <el-button type="primary" v-show="editStart1" @click="editStates1(1)" plain>修改信息</el-button>
+        <el-button type="primary" v-show="!editStart1" @click="editStates1(2)" plain>提交</el-button>
+        <el-button type="primary" v-show="!editStart1" @click="editStates1(3)" plain>取消</el-button>
+      </el-col>
+    </el-row>
+  </div>
 </div>
 </template>
 
@@ -214,8 +146,15 @@ import {
   baseImgPath
 } from '@/config/env';
 import {
-  prov
+  prov,
+  getinfo,
+  uploadverifyinfo,
+  getsign,
+  updateheadimg,
+  getcheckinfo
 } from '@/api/getData';
+import axios from 'axios';
+import detailModel from '@/page/popup/infoModel';
 
 export default {
   data() {
@@ -223,11 +162,17 @@ export default {
       baseUrl,
       baseImgPath,
       restaurants: [],
+      dialogShowOrHide: false,
+      checkInfo: [],
       state1: '',
       state2: '',
       input: '',
       editStart: true,
+      editStart1: true,
+      dataInfoShow: false,
+      dataInfoShow1: false,
       radio: '1',
+      dataInfo: {},
       pickerOptions1: {
         disabledDate(time) {
           return time.getTime() > Date.now();
@@ -251,23 +196,201 @@ export default {
       }],
       value8: '5',
       options2: [],
-      selectedOptions3: ['北京市', '北京市', '朝阳区']
+      basicProCityDistrict: ['北京市', '北京市', '朝阳区'],
+      selectedOptions3: ['北京市', '北京市', '朝阳区'],
+      dataObject: {},
+      dataFileName: '',
+      imgUrl1: '',
+      imgUrl2: '',
+      imgUrl3: ''
     };
   },
   computed: {
     ...mapState(['adminInfo']),
   },
+  components: {
+    'detailmodel': detailModel
+  },
+  mounted() {
+    this.initEnty();
+    this.provincialCity();
+    this.initGetSign();
+    setInterval(() => {
+      this.initGetSign();
+    }, 10000);
+  },
   methods: {
-    editStates(n) {
-      switch (n) {
+    onResultChange(val) {
+      this.dialogShowOrHide = val; // 4
+    },
+    async onDialogChange(val) {
+      let checkinfo = await getcheckinfo();
+      this.checkInfo = checkinfo.data;
+      this.dialogShowOrHide = val; // 4
+    },
+    async initGetSign() {
+      const res = await getsign();
+
+      var oDate = new Date(); // 实例一个时间对象；
+      var yearSec = '' + oDate.getFullYear() + (oDate.getMonth() + 1) + oDate.getDate() + oDate.getHours() + oDate.getMinutes() + oDate.getSeconds();
+      var rand = '';
+      for (let i = 0; i < 3; i++) {
+        var r = Math.floor(Math.random() * 10);
+        rand += r;
+      }
+      this.dataFileName = 'dev/carmodel/' + yearSec + rand + '.jpg';
+      this.dataObject = { // 多个参数
+        'key': this.dataFileName,
+        'policy': res.data.policy,
+        'OSSAccessKeyId': res.data.accessid,
+        'success_action_status': '200', // 让服务端返回200,不然，默认会返回204
+        'signature': res.data.signature
+      };
+    },
+    async uploadImg(res, file) { // up, file, info   /res, file
+      if (file.status === 'success') {
+        this.$message.success('上传图片成功！');
+        this.dataInfo.headImg = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
+        console.info(this.dataInfo.headImg);
+        await updateheadimg({
+          'headImg': this.dataInfo.headImg
+        });
+      } else {
+        this.$message.error('上传图片失败！');
+      }
+    },
+    uploadImg1(res, file) { // up, file, info   /res, file
+      if (file.status === 'success') {
+        this.$message.success('上传图片成功！');
+        this.imgUrl1 = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
+        // this.dataInfo.cardList[0] = {
+        //   'cardType': 1,
+        //   'imgUrl': 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName,
+        //   'sort': 1
+        // };
+      } else {
+        this.$message.error('上传图片失败！');
+      }
+    },
+    uploadImg2(res, file) { // up, file, info   /res, file
+      if (file.status === 'success') {
+        this.$message.success('上传图片成功！');
+        console.info('https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName);
+        this.imgUrl2 = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
+        // this.dataInfo.cardList[1] = {
+        //   'cardType': 1,
+        //   'imgUrl': 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName,
+        //   'sort': 1
+        // };
+      } else {
+        this.$message.error('上传图片失败！');
+      }
+    },
+    uploadImg3(res, file) { // up, file, info   /res, file
+      if (file.status === 'success') {
+        this.$message.success('上传图片成功！');
+        console.info('https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName);
+        this.imgUrl3 = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
+        // this.dataInfo.cardList[2] = {
+        //   'cardType': 1,
+        //   'imgUrl': 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName,
+        //   'sort': 1
+        // };
+      } else {
+        this.$message.error('上传图片失败！');
+      }
+    },
+    beforeImgUpload(file) {
+      // "jpg,gif,png,bmp"
+      const isJPG = file.type === 'image/jpeg';
+      const isPNG = file.type === 'image/png';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (isJPG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.jpg';
+      }
+      if (isPNG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.png';
+      }
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      return (isJPG || isPNG) && isLt2M;
+    },
+    async initEnty() {
+      let res = await getinfo();
+      let obj = res.data;
+      this.dataInfo = obj;
+      // 返回(-2数据校验异常，401登录失效，403权限不足，-101账户不存在，-110尚未审核，-111审核未通过
+      let checkinfo = await getcheckinfo();
+      switch (checkinfo.data.status) {
         case 1:
-          this.editStart = false;
+          this.dataInfoShow = true;
+          this.$message.error('审核中!');
           break;
         case 2:
+          this.dataInfoShow1 = true;
+          this.$message.error('审核未通过!');
+          break;
+        case 3:
+          this.dataInfoShow1 = false;
+          this.dataInfoShow = false;
+          this.$message.error('审核已通过!');
+          break;
+      }
+    },
+    async editStates(n) {
+      switch (n) {
+        case 1:
+          if (this.dataInfoShow) {
+            this.editStart = true;
+            this.$message.error('快马加鞭审核中,请您耐心等待!');
+          } else {
+            this.editStart = false;
+          }
+          break;
+        case 2:
+          // this.dataInfo.cardList.push({
+          //   "cardType": 1,
+          //   "imgUrl": this.imgUrl1,
+          //   "sort": 0
+          // });
+          const res = await uploadverifyinfo(this.dataInfo);
+          console.log(res);
+          console.log(this.dataInfo);
           console.log('保存');
+          break;
+        case 3:
+          this.editStart = true;
+          break;
+        case 4:
+          this.onDialogChange(true);
           break;
         default:
           this.editStart = true;
+      }
+    },
+    async editStates1(n) {
+      switch (n) {
+        case 1:
+          this.editStart1 = false;
+          break;
+        case 2:
+          const res = await uploadverifyinfo(this.dataInfo);
+          console.log(res);
+          console.log(this.dataInfo);
+          console.log('保存');
+          break;
+        case 3:
+          this.editStart1 = true;
+          break;
+        default:
+          this.editStart1 = true;
       }
     },
     async provincialCity() {
@@ -299,26 +422,6 @@ export default {
       });
       this.options2 = arr;
     },
-    uploadImg(res, file) {
-      if (res.status == 1) {
-        this.adminInfo.avatar = res.image_path;
-      } else {
-        this.$message.error('上传图片失败！');
-      }
-    },
-    beforeImgUpload(file) {
-      console.log(file);
-      const isRightType = (file.type === 'image/jpeg') || (file.type === 'image/png');
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isRightType) {
-        this.$message.error('上传头像图片只能是 JPG 格式!');
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!');
-      }
-      return isRightType && isLt2M;
-    },
     querySearch(queryString, cb) {
       var restaurants = this.restaurants;
       var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
@@ -330,28 +433,9 @@ export default {
         return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
       };
     },
-    loadAll() {
-      return [{
-          "value": "三全鲜食（北新泾店）",
-          "address": "长宁区新渔路144号"
-        },
-        {
-          "value": "Hot honey 首尔炸鸡（仙霞路）",
-          "address": "上海市长宁区淞虹路661号"
-        },
-        {
-          "value": "新旺角茶餐厅",
-          "address": "上海市普陀区真北路988号创邑金沙谷6号楼113"
-        }
-      ];
-    },
     handleSelect(item) {
       console.log(item);
     }
-  },
-  mounted() {
-    this.restaurants = this.loadAll();
-    this.provincialCity();
   }
 };
 </script>

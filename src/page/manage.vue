@@ -46,7 +46,7 @@
       </el-menu>
     </el-col>
     <el-col :span="20" style="height: 100%;overflow: auto;">
-			<head-top></head-top>
+      <head-top></head-top>
       <keep-alive>
         <router-view></router-view>
       </keep-alive>
@@ -57,11 +57,18 @@
 
 <script>
 import headTop from '../common/headTop';
+import {
+  userfunctions
+} from '@/api/getData';
+
 export default {
   computed: {
     defaultActive: function() {
       return this.$route.path.replace('/', '');
     }
+  },
+  mounted() {
+    this.userfunctions();
   },
   methods: {
     handleOpen(key, keyPath) {
@@ -69,6 +76,11 @@ export default {
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);
+    },
+    async userfunctions() {
+      const res = await userfunctions();
+      console.log('导航栏');
+      console.log(res);
     }
   },
   components: {

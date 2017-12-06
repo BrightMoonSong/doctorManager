@@ -73,6 +73,7 @@ export default {
   display: block;
   position: absolute;
   left: 0;
+  top: 10%;
   right: 0;
   margin: auto;
   z-index: 1000;
