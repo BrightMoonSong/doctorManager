@@ -58,7 +58,8 @@
 <script>
 import headTop from '../common/headTop';
 import {
-  userfunctions
+  userfunctions,
+  getcheckinfo
 } from '@/api/getData';
 
 export default {
@@ -78,8 +79,13 @@ export default {
       console.log(key, keyPath);
     },
     async userfunctions() {
-      const res = await userfunctions();
+      let res = await userfunctions();
       console.log('导航栏');
+      console.log(res);
+    },
+    async getcheckinfo() {
+      let res = await getcheckinfo();
+      console.log('获取最新的审核结果');
       console.log(res);
     }
   },

@@ -63,7 +63,7 @@ export default {
   background: rgba(0, 0, 0, 0.7);
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: auto;
 }
 
 /*不限制图片大小，实现居中*/
