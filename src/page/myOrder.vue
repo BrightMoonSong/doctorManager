@@ -24,9 +24,10 @@
       align="right">
     </el-date-picker>
   </div>
-  <div class="el-col el-col-4" style="padding: 5px;width: 168px;">
-    <el-button type="primary" plain @click="searchList">查询</el-button>
-    <el-button type="primary" @click="pageJump" plain>下单</el-button>
+  <div class="el-col el-col-4" style="padding: 5px;width: 190px;">
+    <!-- <el-button type="primary" plain @click="searchList">查询</el-button> -->
+    <el-button type="primary" @click="searchList" icon="el-icon-search">搜索</el-button>
+    <el-button type="success" style="margin-left:0;" @click="pageJump">下单</el-button>
   </div>
   <el-table
     :data="tableData"

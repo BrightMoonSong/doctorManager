@@ -531,9 +531,9 @@ export default {
           }
           break;
         case 2:
-          this.dataInfo.province = this.basicProCityDistrict0 + '';
-          this.dataInfo.city = this.basicProCityDistrict1 + '';
-          this.dataInfo.district = this.basicProCityDistrict2 + '';
+          this.dataInfo.province = this.basicProCityDistrict0;
+          this.dataInfo.city = this.basicProCityDistrict1;
+          this.dataInfo.district = this.basicProCityDistrict2;
           this.dataInfo.cardList = [{
               'cardType': 1,
               'imgUrl': this.imgUrl1,

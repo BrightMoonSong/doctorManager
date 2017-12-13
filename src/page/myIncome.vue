@@ -25,7 +25,8 @@
     </el-date-picker>
   </div>
   <div class="el-col el-col-4" style="padding: 5px;width:72px;">
-    <el-button type="primary" plain>查询</el-button>
+    <!-- <el-button type="primary" plain>查询</el-button> -->
+    <el-button type="primary" @click="searchList" icon="el-icon-search">搜索</el-button>
   </div>
   <el-table
     :data="tableData"
