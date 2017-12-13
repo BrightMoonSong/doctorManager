@@ -15,6 +15,7 @@ const onlineSingleOrder = r => require.ensure([], () => r(require('@/page/online
 const myIncome = r => require.ensure([], () => r(require('@/page/myIncome')), 'myIncome');
 const test = r => require.ensure([], () => r(require('@/page/test')), 'test');
 const trans = r => require.ensure([], () => r(require('@/page/transitionTest')), 'trans');
+const changepwd = r => require.ensure([], () => r(require('@/page/changepwd')), 'changepwd');
 
 Vue.use(Router);
 
@@ -63,6 +64,10 @@ export default new Router({
         path: '/myIncome',
         component: myIncome,
         meta: ['我的收益']
+      }, {
+        path: '/changepwd',
+        component: changepwd,
+        meta: ['修改密码']
       }, {
         path: '/test',
         component: test,

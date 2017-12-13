@@ -21,6 +21,8 @@ Vue.use(ElementUI);
 
 Vue.config.productionTip = false;
 
+// 过滤器--全局
+Vue.filter('money', (value, type) => value === '' ? 0 : '￥' + value.toFixed(2) + type);
 /* eslint-disable no-new */
 window.vm = new Vue({
   el: '#app',

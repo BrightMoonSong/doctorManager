@@ -23,7 +23,7 @@
           type="textarea"
           autosize
           placeholder="请输入内容"
-          v-model="textarea2">
+          v-model="sizeForm.symptoms">
         </el-input>
       </el-form-item>
     </el-form>
@@ -57,6 +57,7 @@
           :options="selectList" v-model="cateIdList"
           @active-item-change="handleItemChange"
           :props="props"
+          filterable
         ></el-cascader>
       </div>
       <div class="el-col el-col-6" style="margin: 15px;">
@@ -173,7 +174,7 @@
           show-overflow-tooltip
           width="150">
           <template slot-scope="scope">
-            <el-input-number size="mini" :min="1" :max="scope.row.stock" v-model="scope.row.thisNum"></el-input-number>
+            <el-input-number size="mini" :min="1" :max="scope.row.stock" v-model="scope.row.count"></el-input-number>
           </template>
         </el-table-column>
         <el-table-column
@@ -187,7 +188,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="chufang">
+      <div class="chufang" v-show="chufshow">
         <span>上传手写处方：</span>
         <el-upload
           class="avatar-uploader"
@@ -202,15 +203,17 @@
         </el-upload>
       </div>
       <div class="drugsTotal">
-        <span>药品总价：</span><span v-text="totalPrice+'元'"></span>
+        <span>药品总价：</span><span>{{totalPrice | money('元')}}</span>
+        <!--  v-text="totalPrice | mymoneyFilter('元')" -->
         <div class="el-col el-col-24" style="text-align: center;">
           <el-button type="success" size="medium" round @click="onSubmit(true)">确认下单</el-button>
           <el-button type="warning" size="medium" round @click="onSubmit(false)">取消</el-button>
         </div>
       </div>
     </div>
-    <reg :dialogShowOrHide="dialogDegShowOrHide" :sizeForm="sizeForm" :selectedGoods="selectedGoods" :imageUrl="imageUrl"
-    :phone="sizeForm.phone" @dialog="onDialogRegChange"></reg>
+    <!-- <reg :dialogShowOrHide="dialogDegShowOrHide" :sizeForm="sizeForm" :selectedGoods="selectedGoods" :imageUrl="imageUrl"
+    :phone="sizeForm.phone" @dialog="onDialogRegChange"></reg>     -->
+    <downorder :downifShow="dialogDegShowOrHide" :sizeForm="sizeForm" :selectedGoods="selectedGoods" :imageUrl="imageUrl" @dialog="onDialogRegChange"></downorder>
     <big-img v-if="showImg" @clickit="viewImg" :imgSrc="bigImgSrc"></big-img>
     <detailmodel :dialogShowOrHide="dialogShowOrHide"
     :selectTable="selectTable" @myevent="onResultChange" @dialog="onDialogChange"></detailmodel>
@@ -223,7 +226,7 @@ import {
   findinfosbypid,
   getinfoforgoods,
   getuserinfo,
-  send,
+  // send,
   findaddress,
   getsign
 } from '@/api/getData';
@@ -237,6 +240,7 @@ import {
 import BigImg from '@/common/BigImg';
 import detailModel from '@/page/popup/detailModel';
 import reg from '@/page/popup/reg';
+import downorder from '@/page/popup/downOrder';
 
 export default {
   data() {
@@ -264,8 +268,8 @@ export default {
       parmValue: '',
       selectedGoods: [],
       tableData: [],
-      textarea2: '',
       multipleSelection: [],
+      chufshow: false,
       addressSelect: '',
       addressList: [],
       sizeForm: {
@@ -273,7 +277,8 @@ export default {
         age: '',
         sex: 1,
         phone: '',
-        address: ''
+        address: '',
+        symptoms: ''
       },
       dataFileName: '',
       dataObject: {},
@@ -286,10 +291,10 @@ export default {
     // 获取三级分类
     this.findinfosbypid();
     this.initData(1, 10);
-    this.initGetSign();
-    setInterval(() => {
-      this.initGetSign();
-    }, 10000);
+    // this.initGetSign();
+    // setInterval(() => {
+    //   this.initGetSign();
+    // }, 4000);
   },
   methods: {
     async searchUserByPhone() {
@@ -297,9 +302,12 @@ export default {
         this.$message.error('请先填写手机号！');
       } else {
         let res = await getuserinfo(this.sizeForm.phone);
-        console.log(res);
         if (res.data !== null) {
           this.userSearched = res.data;
+          this.sizeForm.name = this.userSearched.userName;
+          this.sizeForm.age = this.userSearched.age;
+          this.sizeForm.sex = this.userSearched.sex;
+          this.sizeForm.phone = this.userSearched.phone;
           let resAddress = await findaddress(res.data.userId);
           if (resAddress.data.length > 0) {
             this.addressList = resAddress.data[0].detailAddress;
@@ -394,6 +402,7 @@ export default {
         'success_action_status': '200', // 让服务端返回200,不然，默认会返回204
         'signature': res.data.signature
       };
+      return true;
     },
     async initData(pageNo, pageSize) {
       let res = await findinfos({
@@ -404,7 +413,7 @@ export default {
       });
       if (res.data.length > 0) {
         for (let i = 0; i < res.data.length; i++) {
-          res.data[i].thisNum = 1;
+          res.data[i].count = 1;
         }
       }
       this.tableData = res.data;
@@ -418,53 +427,61 @@ export default {
         this.$message.error('上传图片失败！');
       }
     },
-    beforeImgUpload(file) {
-      // "jpg,gif,png,bmp"
-      const isJPG = file.type === 'image/jpeg';
-      const isPNG = file.type === 'image/png';
-      const isLt2M = file.size / 1024 / 1024 < 2;
+    async beforeImgUpload(file) {
+      let res = await this.initGetSign();
+      if (res) {
+        // "jpg,gif,png,bmp"
+        const isJPG = file.type === 'image/jpeg';
+        const isPNG = file.type === 'image/png';
+        const isLt2M = file.size / 1024 / 1024 < 2;
 
-      if (isJPG) {
-        let arr = this.dataFileName.split('.');
-        this.dataFileName = arr[0] + '.jpg';
+        if (isJPG) {
+          let arr = this.dataFileName.split('.');
+          this.dataFileName = arr[0] + '.jpg';
+        }
+        if (isPNG) {
+          let arr = this.dataFileName.split('.');
+          this.dataFileName = arr[0] + '.png';
+        }
+        if (!isJPG && !isPNG) {
+          this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+        return (isJPG || isPNG) && isLt2M;
+      } else {
+        return false;
       }
-      if (isPNG) {
-        let arr = this.dataFileName.split('.');
-        this.dataFileName = arr[0] + '.png';
-      }
-      if (!isJPG && !isPNG) {
-        this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!');
-      }
-      return (isJPG || isPNG) && isLt2M;
     },
     async onSubmit(boolean) {
       if (boolean) {
         console.log('确认下单');
-        if (this.imageUrl !== '' && this.selectedGoods.length > 0 && this.sizeForm.name !== '' && this.sizeForm.phone !== '' && this.sizeForm.address !== '') {
-          let res = await send({
-            'phone': this.sizeForm.phone,
-            'type': 1
-          });
-          if (res.code === 0) {
-            this.dialogDegShowOrHide = true;
-            this.$notify.success({
-              title: '验证码已发送请注意查收！',
-              message: ''
-            });
+        if (this.chufshow) {
+          if (this.imageUrl !== '') {
+            if (this.selectedGoods.length > 0 && this.sizeForm.name !== '' && this.sizeForm.phone !== '' && this.sizeForm.address !== '') {
+              this.dialogDegShowOrHide = true;
+            } else {
+              this.$notify.error({
+                title: '亲,您信息填写不太完整哦！',
+                message: '请填写完整再确认下单'
+              });
+            }
           } else {
             this.$notify.error({
-              title: '亲,验证码发送失败！',
-              message: '请核对手机号是否正确'
+              title: '亲,您的商品里有处方药！',
+              message: '请上传处方单'
             });
           }
         } else {
-          this.$notify.error({
-            title: '亲,您信息填写不太完整哦！',
-            message: '请填写完整再确认下单'
-          });
+          if (this.selectedGoods.length > 0 && this.sizeForm.name !== '' && this.sizeForm.phone !== '' && this.sizeForm.address !== '') {
+            this.dialogDegShowOrHide = true;
+          } else {
+            this.$notify.error({
+              title: '亲,您信息填写不太完整哦！',
+              message: '请填写完整再确认下单'
+            });
+          }
         }
       } else {
         // 取消下单
@@ -499,6 +516,7 @@ export default {
     },
     onDialogRegChange(val) {
       this.dialogDegShowOrHide = val; // 4
+      this.toggleSelection(false);
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -506,11 +524,23 @@ export default {
     },
     toggleSelection(or) {
       if (or) {
+        // 药品类型：1：处方药   2：非处方    3：其它 goodsType
         if (this.multipleSelection.length > 0) {
           this.selectedGoods = [];
           this.multipleSelection.forEach((val, index) => {
             this.selectedGoods.push(val);
           });
+          let biaoji = 0;
+          this.selectedGoods.forEach((val, index) => {
+            if (val.goodsType === 1) {
+              biaoji = 1;
+            }
+          });
+          if (biaoji === 1) {
+            this.chufshow = true;
+          } else {
+            this.chufshow = false;
+          }
         } else {
           this.$notify.error({
             title: '亲,您还没有选择药品哦',
@@ -536,6 +566,7 @@ export default {
   components: {
     'big-img': BigImg,
     reg,
+    downorder,
     'detailmodel': detailModel
   },
   watch: {
@@ -544,14 +575,28 @@ export default {
         if (val.length > 0) {
           let price = 0;
           val.forEach(value => {
-            price += value.salesPrice * value.thisNum;
+            price += value.salesPrice * value.count;
           });
           this.totalPrice = price;
         } else {
           this.totalPrice = 0;
         }
+        let biaoji = 0;
+        this.selectedGoods.forEach((val, index) => {
+          if (val.goodsType === 1) {
+            biaoji = 1;
+          }
+        });
+        if (biaoji === 1) {
+          this.chufshow = true;
+        } else {
+          this.chufshow = false;
+        }
       },
       deep: true // 对象内部的属性监听，也叫深度监听
+    },
+    addressSelect: function(val, oldVal) {
+      this.sizeForm.address = this.addressList[val].detailAddress;
     }
   }
 };

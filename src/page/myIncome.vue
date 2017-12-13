@@ -1,13 +1,7 @@
 <template lang="html">
 <div class="box">
   <div class="el-col el-col-4" style="padding: 5px;padding-left: 0px;">
-    <el-input v-model="input1" placeholder="按订单号检索"></el-input>
-  </div>
-  <div class="el-col el-col-4" style="padding: 5px;">
-    <el-input v-model="input2" placeholder="按手机号检索"></el-input>
-  </div>
-  <div class="el-col el-col-4" style="padding: 5px;">
-    <el-input v-model="input3" placeholder="按姓名检索"></el-input>
+    <el-input v-model="input1" placeholder="关键词检索"></el-input>
   </div>
   <div class="el-col el-col-4" style="padding: 5px;">
     <el-select v-model="value" clearable placeholder="订单状态">
@@ -106,8 +100,6 @@ export default {
       count: 4,
       currentPage: 1,
       currentPageSize: 10,
-      input2: '',
-      input3: '',
       tableData: [{
         date: '2016-05-02',
         name: '王小虎',

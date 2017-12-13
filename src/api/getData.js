@@ -7,6 +7,12 @@ import http from '@/config/axios';
 export const getsign = () => http('/dapi/oss/getsign');
 
 /**
+ * 根据PID获取子区域列表
+ */
+
+export const findareabypid = data => http('/dapi/area/findinfosbypid/' + data);
+
+/**
  * 登陆
  */
 
@@ -17,6 +23,24 @@ export const login = data => http('/dapi/shiro/login?phone=' + data.phone + '&pa
  */
 
 export const signout = () => http('/dapi/shiro/logout', {}, 'DELETE');
+
+/**
+ * 医生注册
+ */
+
+export const shiroreg = data => http('/dapi/shiro/reg?phone=' + data.phone + '&smsCode=' + data.smsCode + '&password=' + data.password, {}, 'POST');
+
+/**
+ * 医生修改密码
+ */
+
+export const changepwd = data => http('/dapi/shiro/changepwd?&oldPassword=' + data.oldPassword + '&newPassword=' + data.newPassword, {}, 'POST');
+
+/**
+ * 医生忘记密码
+ */
+
+export const shiroforgetpwd = data => http('/dapi/shiro/forgetpwd?phone=' + data.phone + '&smsCode=' + data.smsCode + '&newPassword=' + data.password, {}, 'POST');
 
 /**
  * 根据userToken获取用户菜单权限
@@ -43,6 +67,12 @@ export const getcheckinfo = () => http('/dapi/doctor/getcheckinfo');
 export const getinfo = () => http('/dapi/doctor/getinfo');
 
 /**
+ * 获取医生类型id和名称列表
+ */
+
+export const findtypenames = () => http('/dapi/doctor/findtypenames');
+
+/**
  * 修改头像
  */
 
@@ -53,6 +83,18 @@ export const updateheadimg = data => http('/dapi/doctor/updateheadimg?headImg=' 
  */
 
 export const uploadverifyinfo = data => http('/dapi/doctor/uploadverifyinfo', data, 'POST');
+
+/**
+ * 添加银行卡信息
+ */
+
+export const addbankcard = data => http('/dapi/doctor/addbankcard', data, 'POST');
+
+/**
+ * 根据银行卡号获取银行名称
+ */
+
+export const getbankname = data => http('/dapi/doctor/getbankname?cardNo=' + data);
 
 /**
  * 获取在售商品列表
@@ -100,7 +142,7 @@ export const cartsubmit = data => http('/dapi/orders/cartsubmit', data, 'POST');
  * 获取用户订单列表
  */
 
-export const ordersfindinfos = data => http('/dapi/orders/findinfos?parmValue=' + data.parmValue + '&pageSize=' + data.pageSize + '&pageNo=' + data.pageNo + '&userId=' + data.userId + '&orderStatus=' + data.orderStatus + '&datePicker=' + data.datePicker);
+export const ordersfindinfos = data => http('/dapi/orders/findinfos?parmValue=' + data.parmValue + '&minTime=' + data.minTime + '&maxTime=' + data.maxTime + '&pageSize=' + data.pageSize + '&pageNo=' + data.pageNo + '&userId=' + data.userId + '&orderStatus=' + data.orderStatus);
 
 /**
  * 根据ID获取订单详情

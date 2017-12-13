@@ -13,12 +13,16 @@
               </li>
               <li>
                 <span>类型：</span>
-                <el-input style="width:50%;" v-model="dataInfo.type" :disabled="editStart" placeholder="请输入类型"></el-input>
+                <!-- <el-input style="width:50%;" v-model="dataInfo.type" :disabled="editStart" placeholder="请输入类型"></el-input> -->
+                <el-select style="width:50%;" v-model="dataInfo.type" :disabled="editStart" placeholder="请选择类型">
+                  <el-option v-for="item in typeList" :key="item.typeId" :label="item.typeName" :value="item.typeId">
+                  </el-option>
+                </el-select>
               </li>
               <li>
                 <span>性别：</span>
-                <el-radio v-model="dataInfo.gender" :disabled="editStart" label="1">男</el-radio>
-                <el-radio v-model="dataInfo.gender" :disabled="editStart" label="2">女</el-radio>
+                <el-radio v-model="dataInfo.gender" :disabled="editStart" :label="1">男</el-radio>
+                <el-radio v-model="dataInfo.gender" :disabled="editStart" :label="2">女</el-radio>
               </li>
               <li>
                 <span>出生日期：</span>
@@ -27,12 +31,13 @@
               </li>
               <li>
                 <span>所在地区：</span>
-                <el-cascader :options="options2" :disabled="editStart" v-model="basicProCityDistrict"></el-cascader>
+                <!-- <el-cascader :options="options2" :disabled="editStart" @change="adresscas" v-model="basicProCityDistrict"></el-cascader> -->
+                <el-cascader :disabled="editStart" filterable placeholder="选择所在地区" @change="adresscas" :options="selectList" v-model="basicProCityDistrict" @active-item-change="handleItemChange" :props="props"></el-cascader>
               </li>
               <li class="headerImg">
                 <span style="vertical-align: top;">头像：</span>
-                <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg" :before-upload="beforeImgUpload">
-                  <img v-if="dataInfo.headImg" :src="dataInfo.headImg" class="avatar">
+                <el-upload class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg" :before-upload="beforeImgUpload">
+                  <img v-if="headerImg" :src="headerImg" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
               </li>
@@ -66,6 +71,11 @@
                   <img v-if="imgUrl1" :src="imgUrl1" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
+                <span>证件截止有效期：</span>
+                <div class="block">
+                  <el-date-picker :disabled="editStart" style="width: 170px;" v-model="validityDate1" type="date" placeholder="证件截止有效期">
+                  </el-date-picker>
+                </div>
               </li>
               <li class="el-col el-col-8">
                 <span>执业医师证：</span>
@@ -73,6 +83,11 @@
                   <img v-if="imgUrl2" :src="imgUrl2" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
+                <span>证件截止有效期：</span>
+                <div class="block">
+                  <el-date-picker :disabled="editStart" style="width: 170px;" v-model="validityDate2" type="date" placeholder="证件截止有效期">
+                  </el-date-picker>
+                </div>
               </li>
               <li class="el-col el-col-8">
                 <span>健康证：</span>
@@ -80,6 +95,11 @@
                   <img v-if="imgUrl3" :src="imgUrl3" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
+                <span>证件截止有效期：</span>
+                <div class="block">
+                  <el-date-picker :disabled="editStart" style="width: 170px;" v-model="validityDate3" type="date" placeholder="证件截止有效期">
+                  </el-date-picker>
+                </div>
               </li>
               <li style="clear:both;padding: 0;"></li>
             </ul>
@@ -88,12 +108,12 @@
       </div>
     </div>
     <el-row :gutter="20" style="margin-top: 10px;margin-bottom: 10px;">
-      <el-col :span="4" :offset="10" style="min-width:270px;">
+      <el-col :span="4" :offset="9" style="min-width:350px;">
         <el-button type="primary" v-show="editStart" @click="editStates(1)" plain>修改信息</el-button>
-        <el-button type="primary" v-show="dataInfoShow" @click="editStates(4)" plain>审核中信息</el-button>
-        <el-button type="primary" v-show="dataInfoShow1" @click="editStates(4)" plain>审核未通过</el-button>
         <el-button type="primary" v-show="!editStart" @click="editStates(2)" plain>提交</el-button>
         <el-button type="primary" v-show="!editStart" @click="editStates(3)" plain>取消</el-button>
+        <el-button type="primary" v-show="dataInfoShow" @click="editStates(4)" plain>审核中信息</el-button>
+        <el-button type="primary" v-show="dataInfoShow1" @click="editStates(4)" plain>审核未通过</el-button>
       </el-col>
     </el-row>
     <detailmodel :dialogShowOrHide="dialogShowOrHide" :selectTable="checkInfo" @myevent="onResultChange" @dialog="onDialogChange"></detailmodel>
@@ -105,28 +125,27 @@
         <ul>
           <li>
             <span>开户银行：</span>
-            <el-select v-model="value8" :disabled="editStart1" filterable placeholder="请选择">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-              </el-option>
-            </el-select>
+            <!-- <span v-text="bankList.bank"></span> -->
+            <el-input style="width:55%;" v-model="bankList.bank" :disabled="editStart1" placeholder="请输入开户银行名称"></el-input>
           </li>
           <li>
             <span>开户地址：</span>
-            <el-cascader :options="options2" :disabled="editStart1" v-model="selectedOptions3"></el-cascader>
+            <!-- <el-cascader :options="options2" :disabled="editStart1" v-model="bankList.registrationAddress"></el-cascader> -->
+            <el-cascader :disabled="editStart1" filterable placeholder="选择开户地址" :options="selectList" v-model="bankList.registrationAddress" @active-item-change="handleItemChange" :props="props"></el-cascader>
           </li>
           <li>
             <span>支行名称：</span>
-            <el-autocomplete class="inline-input" :disabled="editStart1" v-model="state2" :fetch-suggestions="querySearch" placeholder="请输入支行名称" :trigger-on-focus="false" @select="handleSelect" style="min-width: 204px;"></el-autocomplete>
+            <el-input style="width:55%;" v-model="bankList.registrationBank" :disabled="editStart1" placeholder="请输入支行名称"></el-input>
           </li>
           <li>
             <span>银行账号：</span>
-            <el-input style="width:55%;" v-model="input" :disabled="editStart1" placeholder="请输入银行账号"></el-input>
+            <el-input style="width:55%;" @blur="cardNoBlur" v-model="bankList.cardNo" :disabled="editStart1" placeholder="请输入银行账号"></el-input>
           </li>
         </ul>
       </div>
     </div>
     <el-row :gutter="20" style="margin-top: 10px;margin-bottom: 10px;">
-      <el-col :span="4" :offset="10" style="min-width:270px;">
+      <el-col :span="4" :offset="9" style="min-width:350px;">
         <el-button type="primary" v-show="editStart1" @click="editStates1(1)" plain>修改信息</el-button>
         <el-button type="primary" v-show="!editStart1" @click="editStates1(2)" plain>提交</el-button>
         <el-button type="primary" v-show="!editStart1" @click="editStates1(3)" plain>取消</el-button>
@@ -146,14 +165,20 @@ import {
   baseImgPath
 } from '@/config/env';
 import {
-  prov,
+  getStore,
+  clone
+} from '@/config/mUtils';
+import {
+  findareabypid,
+  findtypenames,
+  addbankcard,
+  getbankname,
   getinfo,
   uploadverifyinfo,
   getsign,
   updateheadimg,
   getcheckinfo
 } from '@/api/getData';
-import axios from 'axios';
 import detailModel from '@/page/popup/infoModel';
 
 export default {
@@ -164,62 +189,156 @@ export default {
       restaurants: [],
       dialogShowOrHide: false,
       checkInfo: [],
+      typeList: [],
       state1: '',
-      state2: '',
-      input: '',
+      registrationBank: '',
+      cardNo: '',
       editStart: true,
       editStart1: true,
       dataInfoShow: false,
       dataInfoShow1: false,
       radio: '1',
-      dataInfo: {},
+      dataInfo: {
+        'doctorName': '',
+        'type': '',
+        'gender': 1,
+        'birthday': '',
+        'province': this.basicProCityDistrict0,
+        'city': this.basicProCityDistrict1,
+        'district': this.basicProCityDistrict2,
+        'phone': '',
+        'telPhone': '',
+        'addressDetail': '',
+        'serviceAgencies': '',
+        'cardList': [{
+            'cardType': 1,
+            'imgUrl': this.imgUrl1,
+            'sort': 1,
+            'validityDate': ''
+          },
+          {
+            'cardType': 2,
+            'imgUrl': this.imgUrl2,
+            'sort': 1,
+            'validityDate': ''
+          },
+          {
+            'cardType': 3,
+            'imgUrl': this.imgUrl3,
+            'sort': 1,
+            'validityDate': ''
+          }
+        ],
+        'doctorId': getStore('userId')
+      },
       pickerOptions1: {
         disabledDate(time) {
           return time.getTime() > Date.now();
         }
       },
-      options: [{
-        value: '1',
-        label: '交通银行'
-      }, {
-        value: '2',
-        label: '工商银行'
-      }, {
-        value: '3',
-        label: '建设银行'
-      }, {
-        value: '4',
-        label: '中国银行'
-      }, {
-        value: '5',
-        label: '北京银行'
-      }],
-      value8: '5',
+      bankList: {
+        'doctorId': getStore('userId'),
+        'bank': '',
+        'registrationAddress': [],
+        'registrationBank': '',
+        'cardNo': ''
+      },
       options2: [],
+      selectList: [],
+      props: {
+        value: 'value',
+        children: 'children'
+      },
       basicProCityDistrict: ['北京市', '北京市', '朝阳区'],
-      selectedOptions3: ['北京市', '北京市', '朝阳区'],
+      basicProCityDistrict0: '',
+      basicProCityDistrict1: '',
+      basicProCityDistrict2: '',
+      validityDate1: '',
+      validityDate2: '',
+      validityDate3: '',
       dataObject: {},
       dataFileName: '',
+      headerImg: '',
       imgUrl1: '',
       imgUrl2: '',
       imgUrl3: ''
     };
   },
   computed: {
-    ...mapState(['adminInfo']),
+    ...mapState(['adminInfo'])
   },
   components: {
     'detailmodel': detailModel
   },
   mounted() {
     this.initEnty();
+    this.initType();
     this.provincialCity();
-    this.initGetSign();
-    setInterval(() => {
-      this.initGetSign();
-    }, 10000);
+    // this.initGetSign();
+    // setInterval(() => {
+    //   this.initGetSign();
+    // }, 4200);
   },
   methods: {
+    async initType() {
+      let res = await findtypenames();
+      this.typeList = res.data;
+    },
+    async handleItemChange(val) {
+      if (val.length === 3) {
+        return;
+      }
+      if (isNaN(val[val.length - 1])) {
+        return;
+      }
+      let res = await findareabypid(val[val.length - 1]);
+      if (val.length === 1) {
+        let index = 0;
+        this.selectList.forEach((v, i) => {
+          if (v.value === val[val.length - 1]) {
+            index = i;
+          }
+        });
+        this.selectList[index].children = [];
+        res.data.forEach(m => {
+          let obj = {
+            value: m.areaId,
+            label: m.name,
+            children: []
+          };
+          this.selectList[index].children.push(obj);
+        });
+      } else if (val.length === 2) {
+        let index = 0;
+        let index1 = 0;
+        this.selectList.forEach((v, i) => {
+          if (v.value === val[0]) {
+            index = i;
+          }
+        });
+        this.selectList[index].children.forEach((m, n) => {
+          if (m.value === val[1]) {
+            index1 = n;
+          }
+        });
+        this.selectList[index].children[index1].children = [];
+        res.data.forEach(val => {
+          let obj = {
+            value: val.areaId,
+            label: val.name
+          };
+          this.selectList[index].children[index1].children.push(obj);
+        });
+      }
+    },
+    adresscas() {
+      let leng = this.basicProCityDistrict.length;
+      if (leng === 3) {
+        this.basicProCityDistrict0 = this.basicProCityDistrict[0];
+        this.basicProCityDistrict1 = this.basicProCityDistrict[1];
+        this.basicProCityDistrict2 = this.basicProCityDistrict[2];
+      }
+    },
     onResultChange(val) {
       this.dialogShowOrHide = val; // 4
     },
@@ -230,15 +349,6 @@ export default {
     },
     async initGetSign() {
       const res = await getsign();
-
-      var oDate = new Date(); // 实例一个时间对象；
-      var yearSec = '' + oDate.getFullYear() + (oDate.getMonth() + 1) + oDate.getDate() + oDate.getHours() + oDate.getMinutes() + oDate.getSeconds();
-      var rand = '';
-      for (let i = 0; i < 3; i++) {
-        var r = Math.floor(Math.random() * 10);
-        rand += r;
-      }
-      this.dataFileName = 'dev/carmodel/' + yearSec + rand + '.jpg';
       this.dataObject = { // 多个参数
         'key': this.dataFileName,
         'policy': res.data.policy,
@@ -246,15 +356,23 @@ export default {
         'success_action_status': '200', // 让服务端返回200,不然，默认会返回204
         'signature': res.data.signature
       };
+      if (res.code === 0) {
+        return true;
+      } else {
+        return false;
+      }
     },
     async uploadImg(res, file) { // up, file, info   /res, file
       if (file.status === 'success') {
         this.$message.success('上传图片成功！');
-        this.dataInfo.headImg = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
-        console.info(this.dataInfo.headImg);
-        await updateheadimg({
-          'headImg': this.dataInfo.headImg
+        this.headerImg = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
+        console.info(this.headerImg);
+        let respon = await updateheadimg({
+          'headImg': this.headerImg
         });
+        if (respon.code === 1) {
+          this.adminInfo.avatar = this.headerImg;
+        }
       } else {
         this.$message.error('上传图片失败！');
       }
@@ -263,11 +381,6 @@ export default {
       if (file.status === 'success') {
         this.$message.success('上传图片成功！');
         this.imgUrl1 = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
-        // this.dataInfo.cardList[0] = {
-        //   'cardType': 1,
-        //   'imgUrl': 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName,
-        //   'sort': 1
-        // };
       } else {
         this.$message.error('上传图片失败！');
       }
@@ -277,11 +390,6 @@ export default {
         this.$message.success('上传图片成功！');
         console.info('https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName);
         this.imgUrl2 = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
-        // this.dataInfo.cardList[1] = {
-        //   'cardType': 1,
-        //   'imgUrl': 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName,
-        //   'sort': 1
-        // };
       } else {
         this.$message.error('上传图片失败！');
       }
@@ -291,56 +399,124 @@ export default {
         this.$message.success('上传图片成功！');
         console.info('https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName);
         this.imgUrl3 = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
-        // this.dataInfo.cardList[2] = {
-        //   'cardType': 1,
-        //   'imgUrl': 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName,
-        //   'sort': 1
-        // };
       } else {
         this.$message.error('上传图片失败！');
       }
     },
-    beforeImgUpload(file) {
-      // "jpg,gif,png,bmp"
-      const isJPG = file.type === 'image/jpeg';
-      const isPNG = file.type === 'image/png';
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (isJPG) {
-        let arr = this.dataFileName.split('.');
-        this.dataFileName = arr[0] + '.jpg';
+    async beforeImgUpload(file) {
+      let res = await this.initGetSign();
+      if (res) {
+        // "jpg,gif,png,bmp"
+        const isJPG = file.type === 'image/jpeg';
+        const isPNG = file.type === 'image/png';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        var oDate = new Date(); // 实例一个时间对象；
+        var yearSec = '' + oDate.getFullYear() + (oDate.getMonth() + 1) + oDate.getDate() + oDate.getHours() + oDate.getMinutes() + oDate.getSeconds();
+        var rand = '';
+        for (let i = 0; i < 3; i++) {
+          var r = Math.floor(Math.random() * 10);
+          rand += r;
+        }
+        this.dataFileName = 'dev/carmodel/' + yearSec + rand + '.jpg';
+        this.dataObject.key = this.dataFileName;
+        if (isJPG) {
+          let arr = this.dataFileName.split('.');
+          this.dataFileName = arr[0] + '.jpg';
+        }
+        if (isPNG) {
+          let arr = this.dataFileName.split('.');
+          this.dataFileName = arr[0] + '.png';
+        }
+        if (!isJPG && !isPNG) {
+          this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+        return (isJPG || isPNG) && isLt2M;
+      } else {
+        return false;
       }
-      if (isPNG) {
-        let arr = this.dataFileName.split('.');
-        this.dataFileName = arr[0] + '.png';
-      }
-      if (!isJPG && !isPNG) {
-        this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!');
-      }
-      return (isJPG || isPNG) && isLt2M;
     },
     async initEnty() {
       let res = await getinfo();
+      if (res.code < 0) {
+        this.$message.error('系统错误');
+        return;
+      }
       let obj = res.data;
+      this.headerImg = obj.headImg;
       this.dataInfo = obj;
-      // 返回(-2数据校验异常，401登录失效，403权限不足，-101账户不存在，-110尚未审核，-111审核未通过
+      if (obj) {
+        if (obj.bankCardList.length > 0) {
+          let dataO = obj.bankCardList[obj.bankCardList.length - 1];
+          let arrBank = dataO.registrationAddress.split('/');
+          dataO.registrationAddress = [Number(arrBank[0]), Number(arrBank[1]), Number(arrBank[2])];
+          await this.handleItemChange([dataO.registrationAddress[0]]);
+          await this.handleItemChange([dataO.registrationAddress[0], dataO.registrationAddress[1]]);
+          await this.handleItemChange([dataO.registrationAddress[0], dataO.registrationAddress[1], dataO.registrationAddress[2]]);
+          this.bankList = dataO;
+        }
+      }
+      this.basicProCityDistrict0 = Number(this.dataInfo.province);
+      this.basicProCityDistrict1 = Number(this.dataInfo.city);
+      this.basicProCityDistrict2 = Number(this.dataInfo.district);
+      await this.handleItemChange([this.basicProCityDistrict0]);
+      await this.handleItemChange([this.basicProCityDistrict0, this.basicProCityDistrict1]);
+      await this.handleItemChange([this.basicProCityDistrict0, this.basicProCityDistrict1, this.basicProCityDistrict2]);
+      this.basicProCityDistrict = [this.basicProCityDistrict0, this.basicProCityDistrict1, this.basicProCityDistrict2];
+      if (this.dataInfo.cardList.length > 0) {
+        for (var i = 0; i < 3; i++) {
+          switch (this.dataInfo.cardList[i].cardType) {
+            case 1:
+              this.imgUrl1 = this.dataInfo.cardList[i].imgUrl;
+              this.validityDate1 = this.dataInfo.cardList[i].validityDate;
+              break;
+            case 2:
+              this.imgUrl2 = this.dataInfo.cardList[i].imgUrl;
+              this.validityDate2 = this.dataInfo.cardList[i].validityDate;
+              break;
+            default:
+              this.imgUrl3 = this.dataInfo.cardList[i].imgUrl;
+              this.validityDate3 = this.dataInfo.cardList[i].validityDate;
+          }
+        }
+      } else {
+        this.dataInfo.cardList = [{
+            'cardType': 1,
+            'imgUrl': this.imgUrl1,
+            'sort': 1,
+            'validityDate': this.validityDate1
+          },
+          {
+            'cardType': 2,
+            'imgUrl': this.imgUrl2,
+            'sort': 1,
+            'validityDate': this.validityDate2
+          },
+          {
+            'cardType': 3,
+            'imgUrl': this.imgUrl3,
+            'sort': 1,
+            'validityDate': this.validityDate3
+          }
+        ]
+      }
+      // 1待审核；2已通过；3未通过 ,
       let checkinfo = await getcheckinfo();
       switch (checkinfo.data.status) {
         case 1:
           this.dataInfoShow = true;
-          this.$message.error('审核中!');
+          this.$message.warning('审核中!');
           break;
         case 2:
-          this.dataInfoShow1 = true;
-          this.$message.error('审核未通过!');
-          break;
-        case 3:
           this.dataInfoShow1 = false;
           this.dataInfoShow = false;
-          this.$message.error('审核已通过!');
+          this.$message.success('个人信息审核已通过!');
+          break;
+        case 3:
+          this.dataInfoShow1 = true;
+          this.$message.error('审核未通过!');
           break;
       }
     },
@@ -349,21 +525,38 @@ export default {
         case 1:
           if (this.dataInfoShow) {
             this.editStart = true;
-            this.$message.error('快马加鞭审核中,请您耐心等待!');
+            this.$message.warning('快马加鞭审核中,请您耐心等待!');
           } else {
             this.editStart = false;
           }
           break;
         case 2:
-          // this.dataInfo.cardList.push({
-          //   "cardType": 1,
-          //   "imgUrl": this.imgUrl1,
-          //   "sort": 0
-          // });
+          this.dataInfo.province = this.basicProCityDistrict0 + '';
+          this.dataInfo.city = this.basicProCityDistrict1 + '';
+          this.dataInfo.district = this.basicProCityDistrict2 + '';
+          this.dataInfo.cardList = [{
+              'cardType': 1,
+              'imgUrl': this.imgUrl1,
+              'sort': 1,
+              'validityDate': this.validityDate1
+            },
+            {
+              'cardType': 2,
+              'imgUrl': this.imgUrl2,
+              'sort': 1,
+              'validityDate': this.validityDate2
+            },
+            {
+              'cardType': 3,
+              'imgUrl': this.imgUrl3,
+              'sort': 1,
+              'validityDate': this.validityDate3
+            }
+          ];
           const res = await uploadverifyinfo(this.dataInfo);
-          console.log(res);
-          console.log(this.dataInfo);
-          console.log('保存');
+          if (res.code === 1) {
+            this.editStart = true;
+          }
           break;
         case 3:
           this.editStart = true;
@@ -375,16 +568,24 @@ export default {
           this.editStart = true;
       }
     },
-    async editStates1(n) {
+    async editStates1(n) { // 添加银行卡信息
       switch (n) {
         case 1:
           this.editStart1 = false;
           break;
         case 2:
-          const res = await uploadverifyinfo(this.dataInfo);
-          console.log(res);
-          console.log(this.dataInfo);
-          console.log('保存');
+          // var dataObj = clone(this.bankList);
+          let dataObj = {
+            'doctorId': this.bankList.doctorId,
+            'bank': this.bankList.bank,
+            'registrationAddress': this.bankList.registrationAddress[0] + '/' + this.bankList.registrationAddress[1] + '/' + this.bankList.registrationAddress[2],
+            'registrationBank': this.bankList.registrationBank,
+            'cardNo': this.bankList.cardNo
+          };
+          let res = await addbankcard(dataObj);
+          if (res.code === 1) {
+            this.editStart1 = true;
+          }
           break;
         case 3:
           this.editStart1 = true;
@@ -393,48 +594,39 @@ export default {
           this.editStart1 = true;
       }
     },
+    async cardNoBlur() {
+      if (this.bankList.cardNo !== '') {
+        let res = await getbankname(this.bankList.cardNo);
+        if (res.code !== 0) {
+          this.$message.error('根据银行卡号获取开户银行失败');
+        } else {
+          if (res.data === null) {
+            // this.bankList.bank = '根据卡号自动得出开户行名称';
+            this.$message.error('根据银行卡号获取开户银行失败');
+          } else {
+            this.bankList.bank = res.data;
+          }
+        }
+        console.log('根据银行卡号获取银行名称');
+        console.log(res);
+      }
+    },
     async provincialCity() {
-      const res = await prov();
-      console.log(res);
-      let arr = [];
-      res.data.forEach(function(item, index) {
-        let value = {
-          value: item.name,
-          label: item.name,
+      let res = await findareabypid(0);
+      this.selectList = [];
+      res.data.forEach(val => {
+        let obj = {
+          value: val.areaId,
+          label: val.name,
           children: []
         };
-        item.city.forEach(function(val, i) {
-          let obj = {
-            value: val.name,
-            label: val.name,
-            children: []
-          };
-          val.area.forEach(function(v, m) {
-            let o = {
-              value: v,
-              label: v
-            };
-            obj.children.push(o);
-          });
-          value.children.push(obj);
-        });
-        arr.push(value);
+        this.selectList.push(obj);
       });
-      this.options2 = arr;
-    },
-    querySearch(queryString, cb) {
-      var restaurants = this.restaurants;
-      var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
-      // 调用 callback 返回建议列表的数据
-      cb(results);
     },
     createFilter(queryString) {
       return (restaurant) => {
         return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
       };
-    },
-    handleSelect(item) {
-      console.log(item);
     }
   }
 };

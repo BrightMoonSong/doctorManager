@@ -31,14 +31,8 @@
     <el-form-item label="所属服务机构：" label-width="115px">
       <span v-text="selectTable.serviceAgencies"></span>
     </el-form-item>
-    <el-form-item label="医师资格证：" label-width="115px">
-        <img :src="selectTable.headImg" alt="..." width="90">
-    </el-form-item>
-    <el-form-item label="执业医师证：" label-width="115px">
-        <img :src="selectTable.headImg" alt="..." width="90">
-    </el-form-item>
-    <el-form-item label="健康证：" label-width="115px">
-        <img :src="selectTable.headImg" alt="..." width="90">
+    <el-form-item v-for="item in selectTable.cardList" :label="cardListlabel(item).label" label-width="115px">
+      <img v-bigimg="cardListlabel(item).imgUrl" :src="cardListlabel(item).imgUrl" alt="..." width="90">
     </el-form-item>
   </el-form>
   <div slot="footer" class="dialog-footer">
@@ -77,6 +71,29 @@ export default {
   methods: {
     viewImg() {
       this.showImg = false;
+    },
+    cardListlabel(val) {
+      let obj = {};
+      switch (val.cardType) {
+        case 1:
+          obj = {
+            'label': '医师资格证：',
+            'imgUrl': val.imgUrl
+          };
+          break;
+        case 2:
+          obj = {
+            'label': '执业医师证：',
+            'imgUrl': val.imgUrl
+          };
+          break;
+        default:
+          obj = {
+            'label': '健康证：',
+            'imgUrl': val.imgUrl
+          };
+      }
+      return obj;
     }
   },
   components: {

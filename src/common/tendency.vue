@@ -58,7 +58,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          boundaryGap: false, // false从[0]开始向右延伸  true从0开始
+          boundaryGap: true, // false从[0]开始向右延伸  true从0开始
           data: this.sevenDay
         },
         yAxis: [{
@@ -90,7 +90,7 @@ export default {
         ],
         series: [{
             name: '下单数',
-            type: 'line',
+            type: 'bar',
             data: this.sevenDate[0],
             markPoint: {
               data: [{
@@ -106,7 +106,7 @@ export default {
           },
           {
             name: '平均每单价格',
-            type: 'line',
+            type: 'bar',
             data: this.sevenDate[1],
             yAxisIndex: 1,
             markPoint: {
@@ -123,7 +123,7 @@ export default {
           },
           {
             name: '收入',
-            type: 'line',
+            type: 'bar',
             data: this.sevenDate[2],
             yAxisIndex: 1,
             markPoint: {
@@ -140,7 +140,7 @@ export default {
           },
           {
             name: '已完成订单',
-            type: 'line',
+            type: 'bar',
             data: this.sevenDate[3],
             yAxisIndex: 1,
             markPoint: {

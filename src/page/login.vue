@@ -3,22 +3,24 @@
   <transition name="form-fade" mode="in-out">
     <section class="form_contianer" v-show="showLogin">
       <div class="manage_tip">
-        <p>doctor管理系统</p>
+        <p>医生管理系统</p>
       </div>
-      <el-form :model="loginForm" :class="[rotate360]" :rules="rules" ref="loginForm">
+      <el-form :model="loginForm" :rules="rules" ref="loginForm">
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" :placeholder="placeholder[0]"></el-input>
+          <el-input v-model="loginForm.username" placeholder="用户名"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input type="password" :placeholder="placeholder[1]" v-model="loginForm.password" @keyup.enter.native="submitForm('loginForm')"></el-input>
+          <el-input type="password" placeholder="密码" v-model="loginForm.password" @keyup.enter.native="submitForm('loginForm')"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('loginForm')" class="submit_btn" v-text="submitText">登陆</el-button>
+          <el-button type="primary" @click="submitForm('loginForm')" class="submit_btn">登录</el-button>
         </el-form-item>
       </el-form>
-      <p class="tip"><a class="forget-the-password" v-show="buttonBottom[0]"><i class="el-icon-arrow-left"></i>{{buttonBottom[0]}}</a><a class="register" @click="register" v-show="buttonBottom[1]">{{buttonBottom[1]}}<i class="el-icon-arrow-right"></i></a></p>
+      <p class="tip"><a class="forget-the-password" @click="forgetPassword"><i class="el-icon-arrow-left"></i>忘记密码</a><a class="register" @click="registerfun">注册<i class="el-icon-arrow-right"></i></a></p>
     </section>
   </transition>
+  <register v-show="registerShow" :regShow="registerShow" @myevent="regdialog"></register>
+  <forgetp v-show="forgetpShow" :forgetpShow="forgetpShow" @myevent="forgetdialog"></forgetp>
 </div>
 </template>
 
@@ -37,14 +39,14 @@ import {
 import {
   setStore
 } from '@/config/mUtils';
+import register from '@/page/popup/register';
+import forgetp from '@/page/popup/forgetPassword';
 
 export default {
   data() {
     return {
-      placeholder: ['用户名', '密码'],
-      buttonBottom: ['忘记密码', '注册'],
-      submitText: '登陆',
-      rotate360: '',
+      registerShow: false,
+      forgetpShow: false,
       loginForm: {
         username: '',
         password: ''
@@ -113,31 +115,19 @@ export default {
         }
       });
     },
-    register() {
-      this.rotate360 = 'rotate360';
-      setTimeout(() => {
-        this.rotate360 = '';
-      }, 1000);
-      setTimeout(() => {
-        this.placeholder = ['手机号', '验证码'];
-        this.buttonBottom = ['去登陆', ''];
-        this.submitTextFun(1);
-      }, 500);
+    registerfun() {
+      console.log(this.registerShow);
+      this.registerShow = true;
+      console.log(this.registerShow);
     },
-    submitTextFun(n) {
-      switch (n) {
-        case 1:
-          this.submitText = '注册';
-          break;
-        case 2:
-          this.submitText = '登陆';
-          break;
-        case 3:
-          this.submitText = '提交';
-          break;
-        default:
-          this.submitText = '登陆';
-      }
+    regdialog(val) {
+      this.registerShow = val;
+    },
+    forgetPassword() {
+      this.forgetpShow = true;
+    },
+    forgetdialog(val) {
+      this.forgetpShow = val;
     }
   },
   watch: {
@@ -157,6 +147,10 @@ export default {
         this.submitForm('loginForm');
       }
     }
+  },
+  components: {
+    register,
+    forgetp
   }
 };
 </script>
@@ -203,7 +197,7 @@ export default {
 }
 .forget-the-password {
     float: left;
-    color: #ccc;
+    color: #999;
     cursor: pointer;
     &:hover {
         color: #090c0a;
@@ -211,16 +205,10 @@ export default {
 }
 .register {
     float: right;
-    color: #ccc;
+    color: #999;
     cursor: pointer;
     &:hover {
         color: #090c0a;
     }
-}
-
-.rotate360 {
-    // transform: rotate(360deg);
-    transform: rotate3d(0,1,0,360deg);
-    transition: transform 0.8s ease-in-out;
 }
 </style>

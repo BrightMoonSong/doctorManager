@@ -5,6 +5,7 @@
         :options="selectList" v-model="cateIdList"
         @active-item-change="handleItemChange"
         :props="props"
+        filterable
       ></el-cascader>
     </div>
     <div class="el-col el-col-6" style="margin: 15px;">
@@ -131,13 +132,13 @@ export default {
           }
         });
         this.selectList[index].children = [];
-        res.data.forEach(val => {
+        res.data.forEach(m => {
           let obj = {
-            value: val.cateId,
-            label: val.cateName,
+            value: m.cateId,
+            label: m.cateName,
             children: []
           };
-          this.selectList[0].children.push(obj);
+          this.selectList[index].children.push(obj);
         });
       } else if (val.length === 2) {
         let index = 0;

@@ -6,10 +6,11 @@
     <el-breadcrumb-item v-for="(item, index) in $route.meta" key="index">{{item}}</el-breadcrumb-item>
   </el-breadcrumb>
   <el-dropdown @command="handleCommand" menu-align='start'>
-    <img src="./../assets/1.jpg" class="avator">
+    <img :src="adminInfo.avatar" class="avator">
     <el-dropdown-menu slot="dropdown">
       <el-dropdown-item command="home">首页</el-dropdown-item>
       <el-dropdown-item command="personalData">个人资料</el-dropdown-item>
+      <el-dropdown-item command="changepwd">修改密码</el-dropdown-item>
       <el-dropdown-item command="singout">退出</el-dropdown-item>
     </el-dropdown-menu>
   </el-dropdown>
@@ -21,26 +22,26 @@ import {
   signout
 } from '@/api/getData';
 import {
-  mapActions,
   mapState
 } from 'vuex';
 
 export default {
   created() {
     if (!this.adminInfo.id) {
-      this.getAdminData();
+      // this.getAdminData();
     }
   },
   computed: {
     ...mapState(['adminInfo'])
   },
   methods: {
-    ...mapActions(['getAdminData']),
     async handleCommand(command) {
       if (command == 'home') {
         this.$router.push('/manage');
       } else if (command == 'personalData') {
         this.$router.push('/dataManagement');
+      } else if (command == 'changepwd') {
+        this.$router.push('/changepwd');
       } else if (command == 'singout') {
         const res = await signout();
         if (res.code === 0) {

@@ -41,6 +41,36 @@ export const removeForIndex = (array, index) => {
 }
 
 /**
+ * 针对引用数据类型    克隆
+ */
+export const clone = obj => {
+  var o, i, j, k;
+  if (typeof(obj) != 'object' || obj === null) return obj;
+  if (obj instanceof(Array)) {
+    o = [];
+    i = 0;
+    j = obj.length;
+    for (; i < j; i++) {
+      if (typeof(obj[i]) == 'object' && obj[i] != null) {
+        o[i] = arguments.callee(obj[i]);
+      } else {
+        o[i] = obj[i];
+      }
+    }
+  } else {
+    o = {};
+    for (i in obj) {
+      if (typeof(obj[i]) == 'object' && obj[i] != null) {
+        o[i] = arguments.callee(obj[i]);
+      } else {
+        o[i] = obj[i];
+      }
+    }
+  }
+  return o;
+}
+
+/**
  * 获取style样式
  */
 export const getStyle = (element, attr, NumberMode = 'int') => {
@@ -199,7 +229,7 @@ export const animate = (element, target, duration = 400, mode = 'ease-out', call
 
   //获取dom样式
   const attrStyle = attr => {
-    if (attr === "opacity") {
+    if (attr === 'opacity') {
       return Math.round(getStyle(element, attr, 'float') * 100);
     } else {
       return getStyle(element, attr);
@@ -280,8 +310,8 @@ export const animate = (element, target, duration = 400, mode = 'ease-out', call
       if (status) {
         flag = false;
         //opacity 和 scrollTop 需要特殊处理
-        if (attr === "opacity") {
-          element.style.filter = "alpha(opacity:" + (iCurrent + iSpeed) + ")";
+        if (attr === 'opacity') {
+          element.style.filter = 'alpha(opacity:' + (iCurrent + iSpeed) + ')';
           element.style.opacity = (iCurrent + iSpeed) / 100;
         } else if (attr === 'scrollTop') {
           element.scrollTop = iCurrent + iSpeed;

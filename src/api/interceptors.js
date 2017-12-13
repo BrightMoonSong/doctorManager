@@ -39,11 +39,14 @@ axios.interceptors.response.use(function(response) {
       title: '401',
       message: '请重新登录'
     });
+    setTimeout(() => {
+      window.vm.$router.push('/');
+    }, 2000);
   }
   if (response.data.code === -1) {
     window.vm.$notify.error({
       title: '-1',
-      message: '保存失败'
+      message: '系统错误'
     });
   }
   if (response.data.code === -115) {
@@ -55,7 +58,7 @@ axios.interceptors.response.use(function(response) {
   if (response.data.code === 1) {
     window.vm.$notify.success({
       title: '1',
-      message: '保存成功'
+      message: '操作成功'
     });
   }
   return response.data;

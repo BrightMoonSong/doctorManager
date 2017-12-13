@@ -46,34 +46,24 @@
       align="center">
     </el-table-column>
     <el-table-column
-      prop="deliveryPhone"
-      align="center"
-      show-overflow-tooltip
-      label="订单手机号">
-    </el-table-column>
-    <el-table-column
-      prop="address"
-      align="center"
-      show-overflow-tooltip
-      label="下单时间">
-    </el-table-column>
-    <el-table-column
-      prop="address"
-      show-overflow-tooltip
-      align="center"
-      label="订单状态">
-    </el-table-column>
-    <el-table-column
-      prop="address"
+      prop="orderMoney"
       align="center"
       show-overflow-tooltip
       label="订单金额">
     </el-table-column>
     <el-table-column
-      prop="address"
+      prop="createTimeStr"
+      align="center"
+      show-overflow-tooltip
+      label="下单时间">
+    </el-table-column>
+    <el-table-column
       show-overflow-tooltip
       align="center"
-      label="订单药品">
+      label="订单状态">
+      <template slot-scope="scope">
+        <span v-text="funStatus(scope.row.orderStatus)"></span>
+      </template>
     </el-table-column>
     <el-table-column
       fixed="right"
@@ -89,37 +79,43 @@
     <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[5, 10, 20, 30, 40]" :page-size="currentPageSize" layout="total, sizes, prev, pager, next, jumper" :total="count">
     </el-pagination>
   </div>
+  <orderdetail :downifShow="dialogDegShowOrHide" :orderId="orderId" @dialog="onDialogRegChange"></orderdetail>
 </div>
 </template>
 
 <script>
 import {
-  ordersfindinfos,
-  ordersdetailbyid
+  ordersfindinfos
 } from '@/api/getData';
 import {
   getStore
 } from '@/config/mUtils';
+import orderdetail from '@/page/popup/orderDetail';
 
 export default {
   data() {
     return {
+      orderId: 0,
       parmValue: '',
       count: 0,
       currentPage: 1,
       currentPageSize: 10,
       tableData: [],
+      dialogDegShowOrHide: false,
       options: [{
         value: '1',
-        label: '待审核'
+        label: '全部订单'
       }, {
         value: '2',
-        label: '待完成'
+        label: '待审核'
       }, {
         value: '3',
-        label: '已完成'
+        label: '待完成'
       }, {
         value: '4',
+        label: '已完成'
+      }, {
+        value: '5',
         label: '无效'
       }],
       orderStatus: '',
@@ -156,22 +152,70 @@ export default {
   mounted() {
     this.initData(1, 10);
   },
+  components: {
+    orderdetail
+  },
   methods: {
-    async ordersdetailbyid(row) {
-      let res = await ordersdetailbyid(row.orderId);
-      console.log(res);
+    onDialogRegChange(val) {
+      this.dialogDegShowOrHide = val; // 4
+    },
+    funStatus(val) {
+      let str = '';
+      switch (val) {
+        case 0:
+          str = '全部订单';
+          break;
+        case 1:
+          str = '待审核';
+          break;
+        case 2:
+          str = '待完成';
+          break;
+        case 3:
+          str = '已完成';
+          break;
+        default:
+          str = '无效';
+      }
+      return str;
+    },
+    ordersdetailbyid(row) {
+      this.dialogDegShowOrHide = true;
+      this.orderId = row.orderId;
+      console.log(this.orderId);
     },
     searchList() {
       this.initData(this.currentPage, this.currentPageSize);
     },
+    dateFtt(fmt, date) {
+      var o = {
+        'M+': date.getMonth() + 1, // 月份
+        'd+': date.getDate(), // 日
+        'h+': date.getHours(), // 小时
+        'm+': date.getMinutes(), // 分
+        's+': date.getSeconds(), // 秒
+        'q+': Math.floor((date.getMonth() + 3) / 3), // 季度
+        'S': date.getMilliseconds() // 毫秒
+      };
+      if (/(y+)/.test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+      }
+      for (var k in o) {
+        if (new RegExp('(' + k + ')').test(fmt)) {
+          fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)));
+        }
+      }
+      return fmt;
+    },
     async initData(pageNo, pageSize) {
       let res = await ordersfindinfos({
+        'minTime': this.datePicker[0] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[0]) : '',
+        'maxTime': this.datePicker[1] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[1]) : '',
         'pageSize': pageSize,
         'pageNo': pageNo,
         'parmValue': this.parmValue,
         'userId': getStore('userId'),
-        'orderStatus': this.orderStatus,
-        'datePicker': this.datePicker
+        'orderStatus': this.orderStatus
       });
       console.log(res);
       console.log(this.datePicker);
