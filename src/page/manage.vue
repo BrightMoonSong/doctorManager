@@ -59,17 +59,22 @@
 import headTop from '../common/headTop';
 import {
   userfunctions,
-  getcheckinfo
+  getinfo
 } from '@/api/getData';
+import {
+  mapState
+} from 'vuex';
 
 export default {
   computed: {
+    ...mapState(['adminInfo']),
     defaultActive: function() {
       return this.$route.path.replace('/', '');
     }
   },
   mounted() {
     this.userfunctions();
+    this.getinfo();
   },
   methods: {
     handleOpen(key, keyPath) {
@@ -83,10 +88,17 @@ export default {
       console.log('导航栏');
       console.log(res);
     },
-    async getcheckinfo() {
-      let res = await getcheckinfo();
-      console.log('获取最新的审核结果');
+    async getinfo() {
+      let res = await getinfo();
+      console.log('获取个人信息');
       console.log(res);
+      if (res.code === 0) {
+        if (res.data) {
+          if (res.data.headImg) {
+            this.adminInfo.avatar = res.data.headImg;
+          }
+        }
+      }
     }
   },
   components: {

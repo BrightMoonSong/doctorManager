@@ -50,12 +50,15 @@ export default {
         return;
       }
       let res = await shiroreg({
-        'phone': '',
-        'smsCode': '',
-        'password': ''
+        'phone': this.registerForm.phone,
+        'smsCode': this.registerForm.smsCode,
+        'password': this.registerForm.password
       });
       console.log('注册');
       console.log(res);
+      if (res.code === 1) {
+        this.myregShow = false;
+      }
     },
     async sendsms() {
       if (this.sendText === '重新发送' || this.sendText === '发送验证码') {

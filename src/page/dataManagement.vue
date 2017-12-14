@@ -121,7 +121,7 @@
   <div>
     <div class="fillcontain">
       <header class="admin_title">结算信息</header>
-      <div class="admin_set">
+      <div class="admin_set" v-show="bankLengthShow">
         <ul>
           <li>
             <span>开户银行：</span>
@@ -146,9 +146,10 @@
     </div>
     <el-row :gutter="20" style="margin-top: 10px;margin-bottom: 10px;">
       <el-col :span="4" :offset="9" style="min-width:350px;">
-        <el-button type="primary" v-show="editStart1" @click="editStates1(1)" plain>修改信息</el-button>
-        <el-button type="primary" v-show="!editStart1" @click="editStates1(2)" plain>提交</el-button>
-        <el-button type="primary" v-show="!editStart1" @click="editStates1(3)" plain>取消</el-button>
+        <el-button type="primary" style="width:100%;" icon="el-icon-plus" v-show="!bankLengthShow" @click="bankLengthShow = true;editStart1=false" plain>添加</el-button>
+        <el-button type="primary" v-show="editStart1 && bankLengthShow" @click="editStates1(1)" plain>删除信息</el-button>
+        <el-button type="primary" v-show="!editStart1 && bankLengthShow" @click="editStates1(2)" plain>提交</el-button>
+        <el-button type="primary" v-show="!editStart1 && bankLengthShow" @click="editStates1(3)" plain>取消</el-button>
       </el-col>
     </el-row>
   </div>
@@ -174,6 +175,7 @@ import {
   addbankcard,
   getbankname,
   getinfo,
+  deletebankcard,
   uploadverifyinfo,
   getsign,
   updateheadimg,
@@ -193,6 +195,7 @@ export default {
       state1: '',
       registrationBank: '',
       cardNo: '',
+      bankLengthShow: false,
       editStart: true,
       editStart1: true,
       dataInfoShow: false,
@@ -444,6 +447,31 @@ export default {
         this.$message.error('系统错误');
         return;
       }
+      // 状态 0禁用；1待审核；2已通过(正常状态)；3未通过；4已注册未提交审核 ,
+      switch (res.data.status) {
+        case 0:
+          this.dataInfoShow = true;
+          this.$message.warning('账号被禁用!');
+          break;
+        case 1:
+          this.dataInfoShow = true;
+          this.$message.warning('审核中!');
+          break;
+        case 2:
+          this.dataInfoShow1 = false;
+          this.dataInfoShow = false;
+          this.$message.success('个人信息审核已通过!');
+          break;
+        case 3:
+          this.dataInfoShow1 = true;
+          this.$message.error('审核未通过!');
+          break;
+        case 4:
+          this.dataInfoShow1 = false;
+          this.editStates(1);
+          // this.$message.error('已注册未提交审核!');
+          break;
+      }
       let obj = res.data;
       this.headerImg = obj.headImg;
       this.dataInfo = obj;
@@ -456,6 +484,9 @@ export default {
           await this.handleItemChange([dataO.registrationAddress[0], dataO.registrationAddress[1]]);
           await this.handleItemChange([dataO.registrationAddress[0], dataO.registrationAddress[1], dataO.registrationAddress[2]]);
           this.bankList = dataO;
+          this.bankLengthShow = true;
+        } else {
+          this.bankLengthShow = false;
         }
       }
       this.basicProCityDistrict0 = Number(this.dataInfo.province);
@@ -501,23 +532,6 @@ export default {
             'validityDate': this.validityDate3
           }
         ]
-      }
-      // 1待审核；2已通过；3未通过 ,
-      let checkinfo = await getcheckinfo();
-      switch (checkinfo.data.status) {
-        case 1:
-          this.dataInfoShow = true;
-          this.$message.warning('审核中!');
-          break;
-        case 2:
-          this.dataInfoShow1 = false;
-          this.dataInfoShow = false;
-          this.$message.success('个人信息审核已通过!');
-          break;
-        case 3:
-          this.dataInfoShow1 = true;
-          this.$message.error('审核未通过!');
-          break;
       }
     },
     async editStates(n) {
@@ -572,6 +586,17 @@ export default {
       switch (n) {
         case 1:
           this.editStart1 = false;
+          let resp = await deletebankcard(this.bankList.id);
+          console.log(resp);
+          // this.initEnty(); // 重新初始化
+          this.bankLengthShow = true; // 重新填银行卡信息
+          this.bankList = {
+            'doctorId': getStore('userId'),
+            'bank': '',
+            'registrationAddress': [],
+            'registrationBank': '',
+            'cardNo': ''
+          };
           break;
         case 2:
           // var dataObj = clone(this.bankList);
@@ -586,9 +611,20 @@ export default {
           if (res.code === 1) {
             this.editStart1 = true;
           }
+          this.initEnty();
           break;
         case 3:
           this.editStart1 = true;
+          this.initEnty();
+          if (this.bankLengthShow) {
+            this.bankList = {
+              'doctorId': getStore('userId'),
+              'bank': '',
+              'registrationAddress': [],
+              'registrationBank': '',
+              'cardNo': ''
+            };
+          }
           break;
         default:
           this.editStart1 = true;

@@ -61,6 +61,18 @@ axios.interceptors.response.use(function(response) {
       message: '操作成功'
     });
   }
+  if (response.data.code === -1007) {
+    window.vm.$notify.success({
+      title: '请稍后重试',
+      message: ''
+    });
+  }
+  if (response.data.code === -1001) {
+    window.vm.$notify.success({
+      title: '手机号格式不正确',
+      message: ''
+    });
+  }
   return response.data;
 }, function(error) {
   // 对响应错误做点什么

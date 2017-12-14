@@ -91,6 +91,12 @@ export const uploadverifyinfo = data => http('/dapi/doctor/uploadverifyinfo', da
 export const addbankcard = data => http('/dapi/doctor/addbankcard', data, 'POST');
 
 /**
+ * 删除银行卡信息
+ */
+
+export const deletebankcard = data => http('/dapi/doctor/deletebankcard?bankCardId=' + data, '', 'PUT');
+
+/**
  * 根据银行卡号获取银行名称
  */
 
