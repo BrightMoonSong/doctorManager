@@ -1,34 +1,39 @@
 <template>
-<div>
-  <!-- <div v-drag>我可以拖拽</div> -->
-  <!-- <img width="100" v-bigimg="'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1512122556735&di=7b15c09607c2afd33ddeb0a2bfbbc8b1&imgtype=0&src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fc995d143ad4bd113c251b84c58afa40f4bfb052b.jpg'"
+<div class="box">
+  <div class="welcome" v-if="barshow">
+    <h2>欢迎使用医生管理系统</h2>
+  </div>
+  <div v-if="!barshow">
+    <!-- <div v-drag>我可以拖拽</div> -->
+    <!-- <img width="100" v-bigimg="'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1512122556735&di=7b15c09607c2afd33ddeb0a2bfbbc8b1&imgtype=0&src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fc995d143ad4bd113c251b84c58afa40f4bfb052b.jpg'"
   v-lodimg="'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1512122556735&di=7b15c09607c2afd33ddeb0a2bfbbc8b1&imgtype=0&src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fc995d143ad4bd113c251b84c58afa40f4bfb052b.jpg'"
   /> -->
-  <!-- <head-top></head-top> -->
-  <section class="data_section">
-    <header class="section_title">收益统计<small class="small-my">注：只有已完成订单计算收益</small></header>
-    <el-row :gutter="20" style="margin-bottom: 10px;">
-      <el-col :span="4">
-        <div class="data_list today_head"><span class="data_num head">订单状态：</span></div>
-      </el-col>
-      <el-col :span="4">
-        <div class="data_list">总订单数<span class="data_num">{{objCount.allOrder}}</span></div>
-      </el-col>
-      <el-col :span="4">
-        <div class="data_list">待审核订单<span class="data_num">{{objCount.toBeAuditedOrder}}</span></div>
-      </el-col>
-      <el-col :span="4">
-        <div class="data_list">待完成订单<span class="data_num">{{objCount.toBeCompletedOrder}}</span></div>
-      </el-col>
-      <el-col :span="4">
-        <div class="data_list">已完成订单<span class="data_num">{{objCount.completedOrder}}</span></div>
-      </el-col>
-      <el-col :span="4">
-        <div class="data_list">无效订单<span class="data_num">{{objCount.invalidOrder}}</span></div>
-      </el-col>
-    </el-row>
-  </section>
-  <tendency :sevenDate='sevenDate' :sevenDay='sevenDay'></tendency>
+    <!-- <head-top></head-top> -->
+    <section class="data_section">
+      <header class="section_title">收益统计<small class="small-my">注：只有已完成订单计算收益</small></header>
+      <el-row :gutter="20" style="margin-bottom: 10px;">
+        <el-col :span="4">
+          <div class="data_list today_head"><span class="data_num head">订单状态：</span></div>
+        </el-col>
+        <el-col :span="4">
+          <div class="data_list">总订单数<span class="data_num">{{objCount.allOrder}}</span></div>
+        </el-col>
+        <el-col :span="4">
+          <div class="data_list">待审核订单<span class="data_num">{{objCount.toBeAuditedOrder}}</span></div>
+        </el-col>
+        <el-col :span="4">
+          <div class="data_list">待完成订单<span class="data_num">{{objCount.toBeCompletedOrder}}</span></div>
+        </el-col>
+        <el-col :span="4">
+          <div class="data_list">已完成订单<span class="data_num">{{objCount.completedOrder}}</span></div>
+        </el-col>
+        <el-col :span="4">
+          <div class="data_list">无效订单<span class="data_num">{{objCount.invalidOrder}}</span></div>
+        </el-col>
+      </el-row>
+    </section>
+    <tendency :sevenDate='sevenDate' :sevenDay='sevenDay'></tendency>
+  </div>
 </div>
 </template>
 
@@ -40,6 +45,7 @@ import dtime from 'time-formater';
 export default {
   data() {
     return {
+      barshow: true,
       objCount: {},
       sevenDay: [],
       sevenDate: [
@@ -81,7 +87,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import '../style/mixin';
 .data_section {
     padding: 20px;
@@ -123,5 +129,14 @@ export default {
     font-size: 12px;
     font-weight: 400;
     color: #afaeae;
+}
+.box {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    .welcome {
+        margin: 0 auto;
+        margin-top: 18%;
+    }
 }
 </style>
