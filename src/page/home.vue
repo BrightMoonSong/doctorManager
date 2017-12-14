@@ -45,7 +45,7 @@ import dtime from 'time-formater';
 export default {
   data() {
     return {
-      barshow: true,
+      barshow: false,
       objCount: {},
       sevenDay: [],
       sevenDate: [

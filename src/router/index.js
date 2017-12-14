@@ -44,35 +44,43 @@ export default new Router({
         path: '/dataManagement',
         component: dataManagement,
         meta: ['资料管理']
-      }, {
+      },
+      {
         path: '/drugInquiry',
         component: drugInquiry,
         meta: ['药品查询']
-      }, {
+      },
+      {
         path: '/online',
         component: online,
         meta: ['在线咨询']
-      }, {
+      },
+      {
         path: '/myOrder',
         component: myOrder,
         meta: ['我的订单']
-      }, {
+      },
+      {
         path: '/onlineSingleOrder',
         component: onlineSingleOrder,
         meta: ['在线下单']
-      }, {
+      },
+      {
         path: '/myIncome',
         component: myIncome,
         meta: ['我的收益']
-      }, {
+      },
+      {
         path: '/changepwd',
         component: changepwd,
         meta: ['修改密码']
-      }, {
+      },
+      {
         path: '/test',
         component: test,
         meta: ['test']
-      }, {
+      },
+      {
         path: '/trans',
         component: trans,
         meta: ['trans']
