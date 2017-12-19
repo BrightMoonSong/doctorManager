@@ -9,6 +9,7 @@
   v-lodimg="'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1512122556735&di=7b15c09607c2afd33ddeb0a2bfbbc8b1&imgtype=0&src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fc995d143ad4bd113c251b84c58afa40f4bfb052b.jpg'"
   /> -->
     <!-- <head-top></head-top> -->
+    <!-- <canvas id="canvas"></canvas> -->
     <section class="data_section">
       <header class="section_title">收益统计<small class="small-my">注：只有已完成订单计算收益</small></header>
       <el-row :gutter="20" style="margin-bottom: 10px;">
@@ -33,6 +34,10 @@
       </el-row>
     </section>
     <tendency :sevenDate='sevenDate' :sevenDay='sevenDay'></tendency>
+    <div v-if="qrcShow">
+      <qrc :Website='Website'></qrc>
+    </div>
+    <button type="button" name="button" @click="qrcclick">qrcShow</button>
   </div>
 </div>
 </template>
@@ -41,11 +46,14 @@
 // import headTop from '../common/headTop';
 import tendency from '../common/tendency';
 import dtime from 'time-formater';
+import qrc from '../common/qrcode';
 
 export default {
   data() {
     return {
       barshow: false,
+      qrcShow: false,
+      Website: 'http://www.baidu.com',
       objCount: {},
       sevenDay: [],
       sevenDate: [
@@ -58,7 +66,8 @@ export default {
   },
   components: {
     // headTop,
-    tendency
+    tendency,
+    qrc
   },
   mounted() {
     this.objCount = {
@@ -82,13 +91,19 @@ export default {
     // this.sevenDay = ['2017-11-20', '2017-11-24', '2017-11-25', '2017-11-26', '2017-11-27', '2017-11-28', '2017-11-29']
   },
   methods: {
-
+    qrcclick() {
+      this.qrcShow = !this.qrcShow;
+    }
   }
 };
 </script>
 
 <style lang="less" scoped>
 @import '../style/mixin';
+#canvas {
+    width: 200px!important;
+    height: 200px!important;
+}
 .data_section {
     padding: 20px;
     margin-bottom: 40px;
@@ -135,8 +150,7 @@ export default {
     height: 100%;
     text-align: center;
     .welcome {
-        margin: 0 auto;
-        margin-top: 18%;
+        margin: 18% auto 0;
     }
 }
 </style>

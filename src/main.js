@@ -6,6 +6,7 @@ import router from './router';
 import '@/api/interceptors.js';
 
 // import Kiko from 'kiko-rascalhao';
+import QRCode from 'qrcode';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
@@ -17,6 +18,7 @@ Vue.directive('drag', drag);
 Vue.directive('lodimg', lodimg);
 Vue.directive('bigimg', bigimg);
 // Vue.use(Kiko);
+Vue.use(QRCode);
 Vue.use(ElementUI);
 
 Vue.config.productionTip = false;
