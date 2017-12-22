@@ -33,7 +33,7 @@ import {
 } from '@/api/getData';
 /* eslint-enable */
 import {
-  mapActions,
+  // mapActions,
   mapState
 } from 'vuex';
 import {
@@ -69,9 +69,9 @@ export default {
   },
   mounted() {
     this.showLogin = true;
-    if (!this.adminInfo.id) {
-      this.getAdminData();
-    }
+    // if (!this.adminInfo.id) {
+    //   this.getAdminData();
+    // }
     let _this = this;
     window.addEventListener('keydown', function(e) {
       _this.shySecret = e.keyCode;
@@ -81,7 +81,7 @@ export default {
     ...mapState(['adminInfo'])
   },
   methods: {
-    ...mapActions(['getAdminData']),
+    // ...mapActions(['getAdminData']),
     async submitForm(formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {

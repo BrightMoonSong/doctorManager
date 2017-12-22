@@ -64,6 +64,7 @@ import {
 } from '@/api/getData';
 import {
   removeForIndex,
+  setStore,
   getStore
 } from '@/config/mUtils';
 
@@ -142,6 +143,10 @@ export default {
       console.log(res);
       if (res.code === 1) {
         this.downifShowThis = false;
+        setStore('orderId', res.data);
+        // this.$router.push('/qrcode');
+        // 跳转到 中间 页面等待审核通过去支付
+        this.$router.push('/centerpay');
       }
     },
     deleteRow(scope) {
@@ -154,5 +159,8 @@ export default {
 <style lang="scss" scoped>
 .box {
     width: 100%;
+}
+.chufang {
+    margin-top: 10px;
 }
 </style>

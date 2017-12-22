@@ -49,6 +49,30 @@ axios.interceptors.response.use(function(response) {
       message: '系统错误'
     });
   }
+  if (response.data.code === -302) {
+    window.vm.$notify.error({
+      title: '-302',
+      message: '可用额度不足'
+    });
+  }
+  if (response.data.code === -300) {
+    window.vm.$notify.error({
+      title: '-300',
+      message: '商品已下架'
+    });
+  }
+  if (response.data.code === -303) {
+    window.vm.$notify.error({
+      title: '-303',
+      message: '总金额没有达到发货标准'
+    });
+  }
+  if (response.data.code === -301) {
+    window.vm.$notify.error({
+      title: '-301',
+      message: '库存不足'
+    });
+  }
   if (response.data.code === -115) {
     window.vm.$notify.error({
       title: '-115',

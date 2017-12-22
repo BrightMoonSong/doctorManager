@@ -5,8 +5,6 @@
     </el-table-column>
     <el-table-column prop="createTimeStr" align="center" show-overflow-tooltip label="下单时间">
     </el-table-column>
-    <el-table-column prop="orderMoney" align="center" show-overflow-tooltip label="订单金额">
-    </el-table-column>
     <el-table-column align="center" show-overflow-tooltip label="订单状态">
       <template slot-scope="scope">
         <span v-text="funStatus(scope.row.orderStatus)"></span>
@@ -17,29 +15,19 @@
   </el-table>
   <div class="topline"></div>
   <el-form ref="form" label-width="100px" size="mini">
-    <el-form-item label="姓名：">
-      <span v-text="dataList.orderAddressVo.receiveName" style="width: 75%;"></span>
+    <el-form-item label="收货人：">
+      <span v-text="dataList.receiveName" style="width: 75%;"></span>
     </el-form-item>
-    <el-form-item label="年龄：">
-      <span v-text="dataList.userAge" style="width: 75%;"></span>
+    <el-form-item label="联系方式：">
+      <span v-text="dataList.receivePhone" style="width: 75%;"></span>
     </el-form-item>
-    <el-form-item label="性别：">
-      <el-radio v-model="dataList.userGender" :disabled="true" :label="1">男</el-radio>
-      <el-radio v-model="dataList.userGender" :disabled="true" :label="2">女</el-radio>
-    </el-form-item>
-    <el-form-item label="手机号：">
-      <span v-text="dataList.orderAddressVo.receivePhone" style="width: 75%;"></span>
-    </el-form-item>
-    <el-form-item label="详细地址：">
-      <span v-text="dataList.orderAddressVo.detailAddress" style="width: 75%;"></span>
-    </el-form-item>
-    <el-form-item label="症状：">
-      <span v-text="dataList.sympToms" style="width: 75%;"></span>
+    <el-form-item label="收货地址：">
+      <span v-text="dataList.receiveAddress" style="width: 75%;"></span>
     </el-form-item>
   </el-form>
   <div class="topline"></div>
   <h4>已选药品：</h4>
-  <el-table :data="dataList.orderGoodsVoList" stripe border style="width: 100%;">
+  <el-table :data="dataList.goodsList" stripe border style="width: 100%;">
     <el-table-column prop="src" label="商品图片" show-overflow-tooltip align="center">
       <template slot-scope="scope">
         <img v-bigimg="scope.row.goodsImg" :src="scope.row.goodsImg" alt="..." width="50">
@@ -60,11 +48,6 @@
     </el-table-column>
   </el-table>
   <h4>合计金额：{{totalPrice | money('元')}}</h4>
-  <div class="topline" v-if="dataList.prescriptionUrl"></div>
-  <div class="chufang" v-if="dataList.prescriptionUrl">
-    <span>手写处方：</span>
-    <img v-bigimg="dataList.prescriptionUrl" :src="dataList.prescriptionUrl" width="50" class="thisimg">
-  </div>
   <div slot="footer" class="dialog-footer">
     <el-button type="warning" size="medium" @click="downifShowThis = false">关 闭</el-button>
   </div>
@@ -74,7 +57,7 @@
 
 <script>
 import {
-  ordersdetailbyid
+  getinfodoctororder
 } from '@/api/getData';
 
 export default {
@@ -89,57 +72,44 @@ export default {
   data() {
     return { // 1
       downifShowThis: this.downifShow,
-      imageUrl: '',
       totalPrice: 0,
       toptable: [],
-      dataList: {
-        'orderAddressVo': {}
-      }
+      dataList: {}
     };
   },
   methods: {
     funStatus(val) {
       let str = '';
       switch (val) {
+        case 0:
+          str = '已取消';
+          break;
         case 1:
-          str = '待审核';
+          str = '待商家确认';
           break;
         case 2:
-          str = '待付款';
+          str = '已确认';
           break;
         case 3:
-          str = '待完成';
+          str = '已发货';
           break;
-        case 4:
-          str = '待完成';
-          break;
-        case 5:
+        default:
           str = '已完成';
-          break;
-        case 6:
-          str = '已完成';
-          break;
-        default: // 0
-          str = '无效';
       }
       return str;
     },
     async init() {
-      let res = await ordersdetailbyid(this.orderId);
+      let res = await getinfodoctororder(this.orderId);
       if (res.code === 0) {
-        if (res.data) {
-          this.dataList = res.data;
-          let arr = [];
-          arr.push(res.data);
-          this.toptable = arr;
-          if (res.data.orderGoodsVoList.length > 0) {
-            let total = 0;
-            res.data.orderGoodsVoList.forEach(val => {
-              total += val.price * val.count;
-            });
-            this.totalPrice = total;
-          }
-        }
+        this.dataList = res.data;
+        let arr = [];
+        arr.push(res.data);
+        this.toptable = arr;
+        let total = 0;
+        res.data.goodsList.forEach(val => {
+          total += val.price * val.count;
+        });
+        this.totalPrice = total;
       }
     }
   },

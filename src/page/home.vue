@@ -37,7 +37,8 @@
     <div v-if="qrcShow">
       <qrc :Website='Website'></qrc>
     </div>
-    <button type="button" name="button" @click="qrcclick">qrcShow</button>
+    <!-- <button type="button" name="button" @click="qrcclick">qrcShow</button>
+    <button type="button" name="button" @click="qrcodeclick">qrcodsShow</button> -->
   </div>
 </div>
 </template>

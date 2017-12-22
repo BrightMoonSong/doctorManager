@@ -9,13 +9,19 @@ Vue.use(Vuex);
 
 const state = {
   adminInfo: {
-    avatar: img// 默认头像路径
+    avatar: img // 默认头像路径
+  },
+  navshow: {
+    isshow: false
   }
 };
 
 const mutations = {
   saveAdminInfo(state, adminInfo) {
     state.adminInfo = adminInfo;
+  },
+  saveNavShow(state, navshow) {
+    state.navshow = navshow;
   }
 };
 

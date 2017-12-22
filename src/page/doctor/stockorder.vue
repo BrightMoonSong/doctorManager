@@ -1,8 +1,8 @@
 <template lang="html">
 <div class="box">
-  <div class="el-col el-col-4" style="padding: 5px;padding-left: 0px;">
+  <!-- <div class="el-col el-col-4" style="padding: 5px;padding-left: 0px;">
     <el-input v-model="parmValue" placeholder="关键词检索"></el-input>
-  </div>
+  </div> -->
   <div class="el-col el-col-4" style="padding: 5px;">
     <el-select v-model="orderStatus" style="width:100%" clearable placeholder="订单状态">
       <el-option
@@ -24,10 +24,10 @@
       align="right">
     </el-date-picker>
   </div>
-  <div class="el-col el-col-4" style="padding: 5px;width: 190px;">
+  <div class="el-col el-col-4" style="padding: 5px;width: 210px;">
     <!-- <el-button type="primary" plain @click="searchList">查询</el-button> -->
     <el-button type="primary" @click="searchList" icon="el-icon-search">搜索</el-button>
-    <el-button type="success" style="margin-left:0;" @click="pageJump">下单</el-button>
+    <el-button type="success" style="margin-left:0;" @click="pageJump">下单采购</el-button>
   </div>
   <el-table
     :data="tableData"
@@ -41,16 +41,28 @@
       show-overflow-tooltip>
     </el-table-column>
     <el-table-column
-      prop="userName"
-      label="用户名称"
+      prop="receiveName"
+      label="收货人"
       show-overflow-tooltip
       align="center">
     </el-table-column>
     <el-table-column
-      prop="orderMoney"
+      prop="receivePhone"
       align="center"
       show-overflow-tooltip
-      label="订单金额">
+      label="收货人手机号">
+    </el-table-column>
+    <el-table-column
+      prop="receiveAddress"
+      align="center"
+      show-overflow-tooltip
+      label="收货地址">
+    </el-table-column>
+    <el-table-column
+      prop="remark"
+      align="center"
+      show-overflow-tooltip
+      label="留言">
     </el-table-column>
     <el-table-column
       prop="createTimeStr"
@@ -70,10 +82,11 @@
       fixed="right"
       label="操作"
       align="center"
-      width="100">
+      width="200">
       <template slot-scope="scope">
-        <el-button @click="ordersdetailbyid(scope.row)" type="text" size="small">查看</el-button>
-        <el-button v-show="scope.row.orderStatus===2" @click="payJump(scope.row.orderId)" type="text" size="small">去支付</el-button>
+        <el-button @click="ordersdetailbyid(scope.row)" type="text" size="small">详情</el-button>
+        <el-button @click="logisticsDetailbyid(scope.row)" type="text" size="small" v-if="scope.row.orderStatus===3||scope.row.orderStatus===4">物流</el-button>
+        <el-button @click="receiveFun(scope.row.orderId)" type="text" size="small" v-if="scope.row.orderStatus===3">确认收货</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -82,47 +95,48 @@
     </el-pagination>
   </div>
   <orderdetail :downifShow="dialogDegShowOrHide" :orderId="orderId" @dialog="onDialogRegChange"></orderdetail>
+  <logistics :downifShow="logisticsDetailShow" :orderId="orderLogId" @dialog="onlogChange"></logistics>
 </div>
 </template>
 
 <script>
 import {
-  ordersfindinfos
+  findinfoordersself,
+  receive
 } from '@/api/getData';
 import {
-  getStore,
-  setStore
+  getStore
 } from '@/config/mUtils';
-import orderdetail from '@/page/popup/orderDetail';
+import orderdetail from '@/page/doctor/orderDetail';
+import logistics from '@/page/doctor/logisticsDetail';
 
 export default {
   data() {
     return {
       orderId: 0,
+      orderLogId: 0,
       parmValue: '',
       count: 0,
       currentPage: 1,
       currentPageSize: 10,
       tableData: [],
       dialogDegShowOrHide: false,
+      logisticsDetailShow: false,
       options: [{
+        value: '0',
+        label: '已取消'
+      }, {
         value: '1',
-        label: '全部订单'
+        label: '待商家确认'
       }, {
         value: '2',
-        label: '待审核'
+        label: '已确认'
       }, {
         value: '3',
-        label: '待付款'
+        label: '已发货'
       }, {
         value: '4',
-        label: '待完成'
-      }, {
-        value: '5',
         label: '已完成'
-      }, {
-        value: '6',
-        label: '无效'
       }],
       orderStatus: '',
       pickerOptions2: {
@@ -159,46 +173,64 @@ export default {
     this.initData(1, 10);
   },
   components: {
-    orderdetail
+    orderdetail,
+    logistics
   },
   methods: {
-    payJump(orderId) {
-      setStore('orderId', orderId);
-      this.$router.push('/qrcode');
-    },
     onDialogRegChange(val) {
       this.dialogDegShowOrHide = val; // 4
+    },
+    onlogChange(val) {
+      this.logisticsDetailShow = val; // 4
     },
     funStatus(val) {
       let str = '';
       switch (val) {
+        case 0:
+          str = '已取消';
+          break;
         case 1:
-          str = '待审核';
+          str = '待商家确认';
           break;
         case 2:
-          str = '待付款';
+          str = '已确认';
           break;
         case 3:
-          str = '待完成';
+          str = '已发货';
           break;
-        case 4:
-          str = '待完成';
-          break;
-        case 5:
+        default:
           str = '已完成';
-          break;
-        case 6:
-          str = '已完成';
-          break;
-        default: // 0
-          str = '无效';
       }
       return str;
+    },
+    async receiveFunConfim(orderId) {
+      let res = await receive(orderId);
+      console.log(res);
+      if (res.code === 1) {
+        this.initData(1, 10);
+      }
+    },
+    receiveFun(orderId) {
+      this.$confirm('确定已收货?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.receiveFunConfim(orderId);
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        });
+      });
+    },
+    logisticsDetailbyid(row) {
+      this.logisticsDetailShow = true;
+      this.orderLogId = row.orderId;
     },
     ordersdetailbyid(row) {
       this.dialogDegShowOrHide = true;
       this.orderId = row.orderId;
-      console.log(this.orderId);
     },
     searchList() {
       this.initData(this.currentPage, this.currentPageSize);
@@ -224,14 +256,18 @@ export default {
       return fmt;
     },
     async initData(pageNo, pageSize) {
-      let res = await ordersfindinfos({
+      let status = this.orderStatus;
+      if (status === '') {
+        status = 5;
+      }
+      let res = await findinfoordersself({
         'minTime': this.datePicker[0] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[0]) : '',
         'maxTime': this.datePicker[1] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[1]) : '',
         'pageSize': pageSize,
         'pageNo': pageNo,
         'parmValue': this.parmValue,
         'userId': getStore('userId'),
-        'orderStatus': this.orderStatus
+        'orderStatus': status
       });
       console.log(res);
       console.log(this.datePicker);
@@ -251,7 +287,7 @@ export default {
       this.offset = (val - 1) * this.limit;
     },
     pageJump() {
-      this.$router.push('onlineSingleOrder');
+      this.$router.push('purchase');
     }
   }
 };

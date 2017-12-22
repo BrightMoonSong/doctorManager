@@ -1,57 +1,6 @@
 <template lang="html">
   <div class="box">
-    <el-form ref="form" :model="sizeForm" label-width="80px" size="mini">
-      <el-form-item label="手机号">
-        <el-input v-model="sizeForm.phone" style="width: 75%;"></el-input>
-        <el-button type="primary" plain @click="searchUserByPhone">查询</el-button>
-      </el-form-item>
-      <el-form-item label="姓名">
-        <el-input v-model="sizeForm.name" style="width: 75%;"></el-input>
-      </el-form-item>
-      <el-form-item label="年龄">
-        <el-input v-model="sizeForm.age" style="width: 75%;"></el-input>
-      </el-form-item>
-      <el-form-item label="性别">
-        <el-radio v-model="sizeForm.sex" :label="1">男</el-radio>
-        <el-radio v-model="sizeForm.sex" :label="2">女</el-radio>
-      </el-form-item>
-      <el-form-item label="详细地址">
-        <el-input v-model="sizeForm.address" style="width: 75%;"></el-input>
-      </el-form-item>
-      <el-form-item label="症状">
-        <el-input
-          type="textarea"
-          autosize
-          placeholder="请输入内容"
-          v-model="sizeForm.symptoms">
-        </el-input>
-      </el-form-item>
-    </el-form>
-    <div class="adress" v-if="userSearched.userName">
-      <el-card class="box-card">
-        <ul class="card-ul">
-          <li>
-            <span>姓名：</span><span v-text="userSearched.userName"></span>
-          </li>
-          <li>
-            <span>年龄：</span><span v-text="userSearched.age"></span>
-          </li>
-          <li>
-            <span>性别：</span><span v-text="userSearched.sex===1?'男':'女'"></span>
-          </li>
-          <li>
-            <span>手机：</span><span v-text="userSearched.phone"></span>
-          </li>
-          <li v-for="(item, index) in addressList" :key="index">
-            <span>详细地址：</span><span v-text="item.detailAddress"></span>
-            <el-radio v-model="addressSelect" :label="index">选择</el-radio>
-          </li>
-        </ul>
-      </el-card>
-    </div>
-    <div class="clearfix"></div>
-    <div class="drugsSearch">
-      <h4>推荐用药：</h4>
+    <div class="drugsSearch" style="border-top:0;margin-top:0;padding-top:0;">
       <div class="el-col el-col-6" style="margin: 15px;">
         <el-cascader style="width:100%;" placeholder="检索分类"
           :options="selectList" v-model="cateIdList"
@@ -188,47 +137,38 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="chufang" v-show="chufshow">
-        <span>上传手写处方：</span>
-        <el-upload
-          class="avatar-uploader"
-          action="https://zhydl.oss-cn-beijing.aliyuncs.com"
-          :show-file-list="false"
-          :data="dataObject"
-          name="file"
-          :on-success="uploadImg"
-          :before-upload="beforeImgUpload">
-          <img v-if="imageUrl" :src="imageUrl" class="avatar">
-          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-        </el-upload>
+      <div class="drugsTotal">
+        <span class="el-col el-col-5" style="text-align: right;line-height:40px;">您当前的可用信用额度为：</span>
+        <span class="el-col el-col-5" style="text-align: left;line-height:40px;">{{totalCredit | money('元')}}</span><br /><br />
+        <span class="el-col el-col-5" style="text-align: right;line-height:40px;">已选药品的总价为：</span>
+        <span class="el-col el-col-5" style="text-align: left;line-height:40px;">{{totalPrice | money('元')}}</span><br /><br />
       </div>
       <div class="drugsTotal">
-        <span>药品总价：</span><span>{{totalPrice | money('元')}}</span>
-        <!--  v-text="totalPrice | mymoneyFilter('元')" -->
+        <span class="el-col el-col-5" style="text-align: right;line-height:40px;">收货人：</span>
+        <el-input style="width:50%;" v-model="receiveObj.receiveName" placeholder="请输入收货人姓名"></el-input><br /><br />
+        <span class="el-col el-col-5" style="text-align: right;line-height:40px;">联系方式：</span>
+        <el-input style="width:50%;" v-model="receiveObj.receivePhone" placeholder="请输入联系方式"></el-input><br /><br />
+        <span class="el-col el-col-5" style="text-align: right;line-height:40px;">收货地址：</span>
+        <el-input style="width:50%;" v-model="receiveObj.receiveAddress" placeholder="请输入收货地址"></el-input><br /><br />
+        <span class="el-col el-col-5" style="text-align: right;line-height:40px;">留言：</span>
+        <el-input style="width:50%;" v-model="receiveObj.remark" placeholder="请输入备注信息"></el-input><br /><br />
         <div class="el-col el-col-24" style="text-align: center;">
           <el-button type="success" size="medium" round @click="onSubmit(true)">确认下单</el-button>
           <el-button type="warning" size="medium" round @click="onSubmit(false)">取消</el-button>
         </div>
       </div>
     </div>
-    <!-- <reg :dialogShowOrHide="dialogDegShowOrHide" :sizeForm="sizeForm" :selectedGoods="selectedGoods" :imageUrl="imageUrl"
-    :phone="sizeForm.phone" @dialog="onDialogRegChange"></reg>     -->
-    <downorder :downifShow="dialogDegShowOrHide" :sizeForm="sizeForm" :selectedGoods="selectedGoods" :imageUrl="imageUrl" @dialog="onDialogRegChange"></downorder>
-    <big-img v-if="showImg" @clickit="viewImg" :imgSrc="bigImgSrc"></big-img>
-    <detailmodel :dialogShowOrHide="dialogShowOrHide"
-    :selectTable="selectTable" @myevent="onResultChange" @dialog="onDialogChange"></detailmodel>
+    <detailmodel :dialogShowOrHide="dialogShowOrHide" :selectTable="selectTable" @myevent="onResultChange" @dialog="onDialogChange"></detailmodel>
 </div>
 </template>
 
 <script>
 import {
-  findinfoself,
+  findinfos,
+  getinfo,
   findinfosbypid,
-  getinfoself,
-  getuserinfo,
-  // send,
-  // findaddress,
-  getsign
+  getinfoforgoods,
+  cartsubmitself
 } from '@/api/getData';
 import {
   removeForIndex
@@ -237,16 +177,14 @@ import {
   baseUrl,
   baseImgPath
 } from '@/config/env';
-import BigImg from '@/common/BigImg';
 import detailModel from '@/page/popup/detailModel';
-import reg from '@/page/popup/reg';
-import downorder from '@/page/popup/downOrder';
 
 export default {
   data() {
     return {
       selectTable: [],
       baseUrl,
+      receiveObj: {},
       baseImgPath,
       totalPrice: 0,
       imageUrl: '',
@@ -269,18 +207,10 @@ export default {
       selectedGoods: [],
       tableData: [],
       multipleSelection: [],
-      chufshow: false,
       addressSelect: '',
       addressList: [],
-      sizeForm: {
-        name: '',
-        age: '',
-        sex: 1,
-        phone: '',
-        address: '',
-        symptoms: ''
-      },
       dataFileName: '',
+      totalCredit: 0,
       dataObject: {},
       userSearched: {},
       outerVisible: false,
@@ -291,37 +221,13 @@ export default {
     // 获取三级分类
     this.findinfosbypid();
     this.initData(1, 10);
-    // this.initGetSign();
-    // setInterval(() => {
-    //   this.initGetSign();
-    // }, 4000);
+    this.doctorInfo();
   },
   methods: {
-    async searchUserByPhone() {
-      if (!this.sizeForm.phone) {
-        this.$message.error('请先填写手机号！');
-      } else {
-        let res = await getuserinfo(this.sizeForm.phone);
-        if (res.data !== null) {
-          this.userSearched = res.data;
-          this.sizeForm.name = this.userSearched.userName;
-          this.sizeForm.age = this.userSearched.age;
-          this.sizeForm.sex = this.userSearched.sex;
-          this.sizeForm.phone = this.userSearched.phone;
-          // 查询用户的详细地址
-          // let resAddress = await findaddress(res.data.userId);
-          // if (resAddress.data.length > 0) {
-          //   this.addressList = resAddress.data[0].detailAddress;
-          // } else {
-          //   this.addressList = [];
-          // }
-        } else {
-          // this.$message.error('该用户不是药到了会员,请自行填写用户信息！');
-          this.$notify.error({
-            title: '该用户不是药到了会员',
-            message: '请自行填写用户信息,下单后自动注册为药到了会员！'
-          });
-        }
+    async doctorInfo() {
+      let res = await getinfo();
+      if (res.code === 0) {
+        this.totalCredit = res.data.credits;
       }
     },
     search() {
@@ -386,27 +292,8 @@ export default {
         this.selectList.push(obj);
       });
     },
-    async initGetSign() {
-      const res = await getsign();
-      var oDate = new Date(); // 实例一个时间对象；
-      var yearSec = '' + oDate.getFullYear() + (oDate.getMonth() + 1) + oDate.getDate() + oDate.getHours() + oDate.getMinutes() + oDate.getSeconds();
-      var rand = '';
-      for (let i = 0; i < 3; i++) {
-        var r = Math.floor(Math.random() * 10);
-        rand += r;
-      }
-      this.dataFileName = 'dev/carmodel/' + yearSec + rand + '.jpg';
-      this.dataObject = { // 多个参数
-        'key': this.dataFileName,
-        'policy': res.data.policy,
-        'OSSAccessKeyId': res.data.accessid,
-        'success_action_status': '200', // 让服务端返回200,不然，默认会返回204
-        'signature': res.data.signature
-      };
-      return true;
-    },
     async initData(pageNo, pageSize) {
-      let res = await findinfoself({
+      let res = await findinfos({
         'pageSize': pageSize,
         'pageNo': pageNo,
         'parmValue': this.parmValue,
@@ -420,70 +307,38 @@ export default {
       this.tableData = res.data;
       this.count = res.totalSize;
     },
-    uploadImg(res, file) { // up, file, info   /res, file
-      if (file.status === 'success') {
-        this.imageUrl = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
-        console.info(this.imageUrl);
-      } else {
-        this.$message.error('上传图片失败！');
-      }
-    },
-    async beforeImgUpload(file) {
-      let res = await this.initGetSign();
-      if (res) {
-        // "jpg,gif,png,bmp"
-        const isJPG = file.type === 'image/jpeg';
-        const isPNG = file.type === 'image/png';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-
-        if (isJPG) {
-          let arr = this.dataFileName.split('.');
-          this.dataFileName = arr[0] + '.jpg';
-        }
-        if (isPNG) {
-          let arr = this.dataFileName.split('.');
-          this.dataFileName = arr[0] + '.png';
-        }
-        if (!isJPG && !isPNG) {
-          this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-        return (isJPG || isPNG) && isLt2M;
-      } else {
-        return false;
+    async downOrderNext() {
+      let obj = {
+        'goodsList': JSON.parse(JSON.stringify(this.selectedGoods)),
+        'receiveAddress': this.receiveObj.receiveAddress,
+        'receiveName': this.receiveObj.receiveName,
+        'receivePhone': this.receiveObj.receivePhone,
+        'remark': this.receiveObj.remark
+      };
+      obj.goodsList.forEach(val => {
+        val.goodsImg = val.masterImg;
+        val.price = val.salesPrice;
+        val.goodsName = val.name1;
+      });
+      let res = await cartsubmitself(obj);
+      if (res.code === 1) {
+        this.$router.push('/stockorder');
       }
     },
     async onSubmit(boolean) {
       if (boolean) {
-        console.log('确认下单');
-        if (this.chufshow) {
-          if (this.imageUrl !== '') {
-            if (this.selectedGoods.length > 0 && this.sizeForm.name !== '' && this.sizeForm.phone !== '' && this.sizeForm.address !== '') {
-              this.dialogDegShowOrHide = true;
-            } else {
-              this.$notify.error({
-                title: '亲,您信息填写不太完整哦！',
-                message: '请填写完整再确认下单'
-              });
-            }
-          } else {
-            this.$notify.error({
-              title: '亲,您的商品里有处方药！',
-              message: '请上传处方单'
-            });
-          }
-        } else {
-          if (this.selectedGoods.length > 0 && this.sizeForm.name !== '' && this.sizeForm.phone !== '' && this.sizeForm.address !== '') {
-            this.dialogDegShowOrHide = true;
-          } else {
-            this.$notify.error({
-              title: '亲,您信息填写不太完整哦！',
-              message: '请填写完整再确认下单'
-            });
-          }
-        }
+        await this.$confirm('请仔细核对信息，确定提交吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.downOrderNext();
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });
+        });
       } else {
         // 取消下单
         this.toggleSelection(false);
@@ -502,7 +357,7 @@ export default {
       this.offset = (val - 1) * this.limit;
     },
     async handleClick(row, index) {
-      let res = await getinfoself(row.goodsId);
+      let res = await getinfoforgoods(row.goodsId);
       console.log(res);
       if (res.code === 0) {
         this.selectTable = res.data;
@@ -530,17 +385,6 @@ export default {
           this.multipleSelection.forEach((val, index) => {
             this.selectedGoods.push(val);
           });
-          let biaoji = 0;
-          this.selectedGoods.forEach((val, index) => {
-            if (val.goodsType === 1) {
-              biaoji = 1;
-            }
-          });
-          if (biaoji === 1) {
-            this.chufshow = true;
-          } else {
-            this.chufshow = false;
-          }
         } else {
           this.$notify.error({
             title: '亲,您还没有选择药品哦',
@@ -564,9 +408,6 @@ export default {
     }
   },
   components: {
-    'big-img': BigImg,
-    reg,
-    downorder,
     'detailmodel': detailModel
   },
   watch: {

@@ -1,11 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-// import HelloWorld from '@/page/HelloWorld';
 
 const login = r => require.ensure([], () => r(require('@/page/login')), 'login');
 const manage = r => require.ensure([], () => r(require('@/page/manage')), 'manage');
 const home = r => require.ensure([], () => r(require('@/page/home')), 'home');
-// const uploadImg = r => require.ensure([], () => r(require('@/page/uploadImg')), 'uploadImg');
 
 const dataManagement = r => require.ensure([], () => r(require('@/page/dataManagement')), 'dataManagement');
 const drugInquiry = r => require.ensure([], () => r(require('@/page/drugInquiry')), 'drugInquiry');
@@ -13,9 +11,12 @@ const online = r => require.ensure([], () => r(require('@/page/online')), 'onlin
 const myOrder = r => require.ensure([], () => r(require('@/page/myOrder')), 'myOrder');
 const onlineSingleOrder = r => require.ensure([], () => r(require('@/page/onlineSingleOrder')), 'onlineSingleOrder');
 const myIncome = r => require.ensure([], () => r(require('@/page/myIncome')), 'myIncome');
-const test = r => require.ensure([], () => r(require('@/page/test')), 'test');
-const trans = r => require.ensure([], () => r(require('@/page/transitionTest')), 'trans');
 const changepwd = r => require.ensure([], () => r(require('@/page/changepwd')), 'changepwd');
+const credit = r => require.ensure([], () => r(require('@/page/doctor/credit')), 'credit');
+const purchase = r => require.ensure([], () => r(require('@/page/doctor/purchase')), 'purchase');
+const stockorder = r => require.ensure([], () => r(require('@/page/doctor/stockorder')), 'stockorder');
+const qrcode = r => require.ensure([], () => r(require('@/page/paycode/qrcode')), 'qrcode');
+const centerpay = r => require.ensure([], () => r(require('@/page/doctor/centerpay')), 'centerpay');
 
 Vue.use(Router);
 
@@ -35,11 +36,6 @@ export default new Router({
         component: home,
         meta: []
       },
-      //  {
-      //   path: '/uploadImg',
-      //   component: uploadImg,
-      //   meta: ['文本编辑', 'MarkDown']
-      // },
       {
         path: '/dataManagement',
         component: dataManagement,
@@ -76,14 +72,29 @@ export default new Router({
         meta: ['修改密码']
       },
       {
-        path: '/test',
-        component: test,
-        meta: ['test']
+        path: '/purchase',
+        component: purchase,
+        meta: ['下单采购']
       },
       {
-        path: '/trans',
-        component: trans,
-        meta: ['trans']
+        path: '/credit',
+        component: credit,
+        meta: ['信用库存']
+      },
+      {
+        path: '/stockorder',
+        component: stockorder,
+        meta: ['备货订单']
+      },
+      {
+        path: '/qrcode',
+        component: qrcode,
+        meta: ['支付']
+      },
+      {
+        path: '/centerpay',
+        component: centerpay,
+        meta: ['审核中']
       }
     ]
   }]

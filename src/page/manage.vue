@@ -5,11 +5,14 @@
       <el-menu style="min-height: 100%;" theme="dark" :default-active="defaultActive" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" background-color="#324057" text-color="#fff" active-text-color="#ffd04b" router>
         <el-menu-item index="manage" style="border:1px;"><i class="el-icon-menu"></i>首页</el-menu-item>
         <el-menu-item index="dataManagement" style="border:1px;"><i class="el-icon-document"></i>资料管理</el-menu-item>
-        <el-menu-item index="drugInquiry" style="border:1px;"><i class="el-icon-setting"></i>药品查询</el-menu-item>
-        <el-menu-item index="online" style="border:1px;"><i class="el-icon-star-on"></i>在线咨询</el-menu-item>
-        <el-menu-item index="myOrder" style="border:1px;"><i class="el-icon-edit"></i>我的订单</el-menu-item>
-        <el-menu-item index="onlineSingleOrder" style="border:1px;"><i class="el-icon-plus"></i>在线下单</el-menu-item>
-        <el-menu-item index="myIncome" style="border:1px;"><i class="el-icon-warning"></i>我的收益</el-menu-item>
+        <el-menu-item index="drugInquiry" style="border:1px;" v-show="navshow.isshow"><i class="el-icon-setting"></i>药品查询</el-menu-item>
+        <el-menu-item index="online" style="border:1px;" v-show="navshow.isshow"><i class="el-icon-star-on"></i>在线咨询</el-menu-item>
+        <el-menu-item index="myOrder" style="border:1px;" v-show="navshow.isshow"><i class="el-icon-edit"></i>我的订单</el-menu-item>
+        <el-menu-item index="onlineSingleOrder" style="border:1px;" v-show="navshow.isshow"><i class="el-icon-plus"></i>在线下单</el-menu-item>
+        <el-menu-item index="myIncome" style="border:1px;" v-show="navshow.isshow"><i class="el-icon-warning"></i>我的收益</el-menu-item>
+        <el-menu-item index="credit" style="border:1px;" v-show="navshow.isshow"><i class="el-icon-message"></i>信用库存</el-menu-item>
+        <el-menu-item index="purchase" style="border:1px;" v-show="navshow.isshow"><i class="el-icon-sold-out"></i>下单采购</el-menu-item>
+        <el-menu-item index="stockorder" style="border:1px;" v-show="navshow.isshow"><i class="el-icon-goods"></i>备货订单</el-menu-item>
 
         <!-- <el-submenu index="2">
           <template slot="title"><i class="el-icon-document"></i>数据管理</template>
@@ -48,7 +51,7 @@
     <el-col :span="20" style="height: 100%;overflow: auto;">
       <head-top></head-top>
       <!-- <keep-alive> -->
-        <router-view></router-view>
+      <router-view></router-view>
       <!-- </keep-alive> -->
     </el-col>
   </el-row>
@@ -67,8 +70,17 @@ import {
 
 export default {
   computed: {
-    ...mapState(['adminInfo']),
+    ...mapState(['navshow', 'adminInfo']),
     defaultActive: function() {
+      if (!this.navshow.isshow) {
+        let arrPath = ['/drugInquiry', '/online', '/myOrder', '/onlineSingleOrder', '/myIncome', '/purchase', '/credit', '/stockorder', '/qrcode', '/centerpay'];
+        arrPath.forEach(val => {
+          if (val === this.$route.path) {
+            this.$router.push('manage');
+            return false;
+          }
+        });
+      }
       return this.$route.path.replace('/', '');
     }
   },
@@ -85,17 +97,19 @@ export default {
     },
     async userfunctions() {
       let res = await userfunctions();
-      console.log('导航栏');
       console.log(res);
     },
     async getinfo() {
       let res = await getinfo();
-      console.log('获取个人信息');
-      console.log(res);
       if (res.code === 0) {
         if (res.data) {
           if (res.data.headImg) {
             this.adminInfo.avatar = res.data.headImg;
+          }
+          if (res.data.status !== 2) {
+            this.navshow.isshow = false;
+          } else {
+            this.navshow.isshow = true;
           }
         }
       }

@@ -154,10 +154,64 @@ export const ordersfindinfos = data => http('/dapi/orders/findinfos?parmValue=' 
  * 根据ID获取订单详情
  */
 
-export const ordersdetailbyid = data => http('/dapi/orders/getinfo/' + data);
+export const ordersdetailbyid = data => http('/dapi/orders/getinfo?orderId=' + data);
 
 /**
- * 获取省市区三级联动
+ * 获取医生自己的商品列表
  */
 
-export const prov = () => http('/api/prov');
+export const findinfoself = data => http('/dapi/goods/findinfos?pageSize=' + data.pageSize + '&pageNo=' + data.pageNo + '&parmValue=' + data.parmValue + '&categoryId=' + data.categoryId + '&orderType=0');
+
+/**
+ * doctor-goods-controller : 医生信用库存商品管理
+ * 根据ID获取商品详情
+ */
+
+export const getinfoself = data => http('/dapi/goods/getinfo?goodsid=' + data);
+
+/**
+ * 医生备货订单
+ * 提交备货订单
+ */
+
+export const cartsubmitself = data => http('/dapi/doctororders/cartsubmit', data, 'POST');
+
+/**
+ * 医生备货订单
+ * 获取用户订单列表
+ */
+
+export const findinfoordersself = data => http('/dapi/doctororders/findinfos?pageSize=' + data.pageSize + '&pageNo=' + data.pageNo + '&maxTime=' + data.maxTime + '&minTime=' + data.minTime + '&orderStatus=' + data.orderStatus);
+
+/**
+ * 医生备货订单
+ * 根据ID获取订单详情
+ */
+
+export const getinfodoctororder = data => http('/dapi/doctororders/getinfo?orderId=' + data);
+
+/**
+ * 医生备货订单
+ * 获取物流信息
+ */
+
+export const getlogisticsdoctororder = data => http('/dapi/doctororders/getlogistics?orderId=' + data);
+
+/**
+ * 医生备货订单
+ * 确认收货
+ */
+
+export const receive = data => http('/dapi/doctororders/receive?orderId=' + data, {}, 'PUT');
+
+/**
+ * 模拟微信扫码支付获取二维码链接接口
+ */
+
+export const getpaycode = data => http('/dapi/orders/getpaycode?orderId=' + data);
+
+/**
+ * 模拟微信扫码支付心跳接口
+ */
+
+export const getpaystatus = data => http('/dapi/orders/getpaystatus?orderId=' + data);

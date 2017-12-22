@@ -278,7 +278,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['adminInfo'])
+    ...mapState(['adminInfo', 'navshow'])
   },
   components: {
     'detailmodel': detailModel
@@ -471,6 +471,7 @@ export default {
           this.dataInfoShow1 = false;
           this.dataInfoShow = false;
           this.$message.success('个人信息审核已通过!');
+          this.navshow.isshow = true;
           break;
         case 3:
           this.dataInfoShow1 = true;
@@ -580,6 +581,8 @@ export default {
           const res = await uploadverifyinfo(this.dataInfo);
           if (res.code === 1) {
             this.editStart = true;
+            this.navshow.isshow = false;
+            this.initEnty();
           }
           break;
         case 3:
