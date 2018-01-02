@@ -2,24 +2,24 @@
   <div class="box">
     <el-form ref="form" :model="sizeForm" label-width="80px" size="mini">
       <el-form-item label="手机号">
-        <el-input v-model="sizeForm.phone" style="width: 75%;"></el-input>
+        <el-input v-model="sizeForm.phone" style="width: 75%;" :maxlength="11"></el-input>
         <el-button type="primary" plain @click="searchUserByPhone">查询</el-button>
       </el-form-item>
       <el-form-item label="姓名">
-        <el-input v-model="sizeForm.name" style="width: 75%;"></el-input>
+        <el-input v-model="sizeForm.name" :maxlength="15" style="width: 75%;"></el-input>
       </el-form-item>
       <el-form-item label="年龄">
-        <el-input v-model="sizeForm.age" style="width: 75%;"></el-input>
+        <el-input v-model="sizeForm.age" :maxlength="3" style="width: 75%;"></el-input>
       </el-form-item>
       <el-form-item label="性别">
         <el-radio v-model="sizeForm.sex" :label="1">男</el-radio>
         <el-radio v-model="sizeForm.sex" :label="2">女</el-radio>
       </el-form-item>
       <el-form-item label="详细地址">
-        <el-input v-model="sizeForm.address" style="width: 75%;"></el-input>
+        <el-input v-model="sizeForm.address" :maxlength="30" style="width: 75%;"></el-input>
       </el-form-item>
       <el-form-item label="症状">
-        <el-input
+        <el-input :maxlength="100"
           type="textarea"
           autosize
           placeholder="请输入内容"
@@ -57,11 +57,11 @@
           :options="selectList" v-model="cateIdList"
           @active-item-change="handleItemChange"
           :props="props"
-          filterable
+          clearable
         ></el-cascader>
       </div>
       <div class="el-col el-col-6" style="margin: 15px;">
-        <el-input placeholder="关键词检索" v-model="parmValue" class="input-with-select">
+        <el-input placeholder="关键词检索" v-model="parmValue" :maxlength="18" class="input-with-select">
           <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
         </el-input>
       </div>
@@ -82,6 +82,14 @@
           show-overflow-tooltip
           label="商品名称"
           align="center">
+        </el-table-column>
+        <el-table-column
+          show-overflow-tooltip
+          label="商品类型"
+          align="center">
+          <template slot-scope="scope">
+            <span>{{goodsTypeList[scope.row.goodsType-1]}}</span>
+          </template>
         </el-table-column>
         <el-table-column
           prop="name2"
@@ -143,6 +151,14 @@
           show-overflow-tooltip
           label="商品名称"
           align="center">
+        </el-table-column>
+        <el-table-column
+          show-overflow-tooltip
+          label="商品类型"
+          align="center">
+          <template slot-scope="scope">
+            <span>{{goodsTypeList[scope.row.goodsType-1]}}</span>
+          </template>
         </el-table-column>
         <el-table-column
           prop="name2"
@@ -248,6 +264,7 @@ export default {
       selectTable: [],
       baseUrl,
       baseImgPath,
+      goodsTypeList: ['处方药', '非处方药', '其他'],
       totalPrice: 0,
       imageUrl: '',
       input5: '',
@@ -290,7 +307,7 @@ export default {
   mounted() {
     // 获取三级分类
     this.findinfosbypid();
-    this.initData(1, 10);
+    this.initData(this.currentPage, this.currentPageSize);
     // this.initGetSign();
     // setInterval(() => {
     //   this.initGetSign();
@@ -301,6 +318,10 @@ export default {
       if (!this.sizeForm.phone) {
         this.$message.error('请先填写手机号！');
       } else {
+        if (!(/^1[34578]\d{9}$/.test(this.sizeForm.phone))) {
+          this.$message.error('手机号格式不正确！');
+          return false;
+        }
         let res = await getuserinfo(this.sizeForm.phone);
         if (res.data !== null) {
           this.userSearched = res.data;
@@ -328,7 +349,7 @@ export default {
       if (this.cateIdList.length === 3) {
         this.categoryId = this.cateIdList[2];
       }
-      this.initData(1, 10);
+      this.initData(this.currentPage, this.currentPageSize);
     },
     async handleItemChange(val) {
       if (val.length === 3) {
@@ -395,7 +416,7 @@ export default {
         var r = Math.floor(Math.random() * 10);
         rand += r;
       }
-      this.dataFileName = 'dev/carmodel/' + yearSec + rand + '.jpg';
+      this.dataFileName = 'dev/doctor/' + yearSec + rand + '.jpg';
       this.dataObject = { // 多个参数
         'key': this.dataFileName,
         'policy': res.data.policy,
@@ -406,6 +427,9 @@ export default {
       return true;
     },
     async initData(pageNo, pageSize) {
+      if (this.cateIdList.length === 0) {
+        this.categoryId = '';
+      }
       let res = await findinfoself({
         'pageSize': pageSize,
         'pageNo': pageNo,
@@ -429,28 +453,48 @@ export default {
       }
     },
     async beforeImgUpload(file) {
+      // "jpg,gif,png,bmp"
+      const isJPG = file.type === 'image/jpeg';
+      const isPNG = file.type === 'image/png';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (isJPG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.jpg';
+      }
+      if (isPNG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.png';
+      }
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
+        return false;
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+        return false;
+      }
       let res = await this.initGetSign();
       if (res) {
         // "jpg,gif,png,bmp"
-        const isJPG = file.type === 'image/jpeg';
-        const isPNG = file.type === 'image/png';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-
-        if (isJPG) {
-          let arr = this.dataFileName.split('.');
-          this.dataFileName = arr[0] + '.jpg';
-        }
-        if (isPNG) {
-          let arr = this.dataFileName.split('.');
-          this.dataFileName = arr[0] + '.png';
-        }
-        if (!isJPG && !isPNG) {
-          this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-        return (isJPG || isPNG) && isLt2M;
+        // const isJPG = file.type === 'image/jpeg';
+        // const isPNG = file.type === 'image/png';
+        // const isLt2M = file.size / 1024 / 1024 < 2;
+        //
+        // if (isJPG) {
+        //   let arr = this.dataFileName.split('.');
+        //   this.dataFileName = arr[0] + '.jpg';
+        // }
+        // if (isPNG) {
+        //   let arr = this.dataFileName.split('.');
+        //   this.dataFileName = arr[0] + '.png';
+        // }
+        // if (!isJPG && !isPNG) {
+        //   this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
+        // }
+        // if (!isLt2M) {
+        //   this.$message.error('上传头像图片大小不能超过 2MB!');
+        // }
+        // return (isJPG || isPNG) && isLt2M;
       } else {
         return false;
       }
@@ -458,6 +502,22 @@ export default {
     async onSubmit(boolean) {
       if (boolean) {
         console.log('确认下单');
+        if (!this.sizeForm.phone) {
+          this.$message.error('手机号是必填项！');
+          return false;
+        }
+        if (!this.sizeForm.symptoms) {
+          this.$message.error('症状是必填项！');
+          return false;
+        }
+        if (!(/^1[34578]\d{9}$/.test(this.sizeForm.phone))) {
+          this.$message.error('手机号格式不正确！');
+          return false;
+        }
+        if (this.selectedGoods.length === 0) {
+          this.$message.error('请选择药品！');
+          return false;
+        }
         if (this.chufshow) {
           if (this.imageUrl !== '') {
             if (this.selectedGoods.length > 0 && this.sizeForm.name !== '' && this.sizeForm.phone !== '' && this.sizeForm.address !== '') {
@@ -465,7 +525,7 @@ export default {
             } else {
               this.$notify.error({
                 title: '亲,您信息填写不太完整哦！',
-                message: '请填写完整再确认下单'
+                message: '姓名年龄性别住址都要填写'
               });
             }
           } else {
@@ -480,7 +540,7 @@ export default {
           } else {
             this.$notify.error({
               title: '亲,您信息填写不太完整哦！',
-              message: '请填写完整再确认下单'
+              message: '姓名年龄性别住址都要填写'
             });
           }
         }
@@ -528,7 +588,15 @@ export default {
         // 药品类型：1：处方药   2：非处方    3：其它 goodsType
         if (this.multipleSelection.length > 0) {
           this.multipleSelection.forEach((val, index) => {
-            this.selectedGoods.push(val);
+            let a = 1;
+            this.selectedGoods.forEach((m, i) => {
+              if (m.goodsId === val.goodsId) {
+                a = 2;
+              }
+            });
+            if (a === 1) {
+              this.selectedGoods.push(val);
+            }
           });
           let biaoji = 0;
           this.selectedGoods.forEach((val, index) => {
@@ -552,6 +620,7 @@ export default {
       }
     },
     deleteRow(scope) {
+      this.selectedGoods[scope.$index].count = 1;
       this.selectedGoods = removeForIndex(this.selectedGoods, scope.$index);
     },
     clickImg(src) {

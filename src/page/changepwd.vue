@@ -1,14 +1,15 @@
 <template lang="html">
   <div class="box">
+    <h3 class="centerTitle">修改密码</h3>
     <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
       <el-form-item label="旧密码" prop="oldpass">
-        <el-input type="password" v-model="ruleForm2.oldpass"></el-input>
+        <el-input type="password" :maxlength="12" v-model="ruleForm2.oldpass"></el-input>
       </el-form-item>
       <el-form-item label="新密码" prop="pass">
-        <el-input type="password" v-model="ruleForm2.pass" auto-complete="off"></el-input>
+        <el-input type="password" :maxlength="12" v-model="ruleForm2.pass" auto-complete="off"></el-input>
       </el-form-item>
       <el-form-item label="确认密码" prop="checkPass">
-        <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off"></el-input>
+        <el-input type="password" :maxlength="12" v-model="ruleForm2.checkPass" auto-complete="off"></el-input>
       </el-form-item>
       <el-form-item>
         <div class="margin">
@@ -105,7 +106,7 @@ export default {
           } else if (res.code === 1) {
             this.$router.push('login');
           }
-          console.log(res);
+          // console.log(res);
         } else {
           console.log('error submit!!');
           return false;
@@ -128,8 +129,12 @@ export default {
         padding: 30px;
         .margin {
             display: table;
+            text-align: center;
             margin: 0 auto;
         }
+    }
+    .centerTitle{
+      text-align: center;
     }
 }
 </style>

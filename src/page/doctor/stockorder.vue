@@ -14,7 +14,7 @@
     </el-select>
   </div>
   <div class="el-col el-col-8" style="padding: 5px;width:400px;padding-left: 0px;">
-    <el-date-picker
+    <el-date-picker :editable="false"
       v-model="datePicker"
       type="datetimerange"
       :picker-options="pickerOptions2"
@@ -87,6 +87,7 @@
         <el-button @click="ordersdetailbyid(scope.row)" type="text" size="small">详情</el-button>
         <el-button @click="logisticsDetailbyid(scope.row)" type="text" size="small" v-if="scope.row.orderStatus===3||scope.row.orderStatus===4">物流</el-button>
         <el-button @click="receiveFun(scope.row.orderId)" type="text" size="small" v-if="scope.row.orderStatus===3">确认收货</el-button>
+        <el-button @click="cancelOrder(scope.row.orderId)" type="text" size="small" v-if="scope.row.orderStatus<3&&scope.row.orderStatus>0">取消订单</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -102,7 +103,8 @@
 <script>
 import {
   findinfoordersself,
-  receive
+  receive,
+  cancel
 } from '@/api/getData';
 import {
   getStore
@@ -170,13 +172,36 @@ export default {
     };
   },
   mounted() {
-    this.initData(1, 10);
+    this.initData(this.currentPage, this.currentPageSize);
   },
   components: {
     orderdetail,
     logistics
   },
   methods: {
+    async downOrderNext(orderId) {
+      let res = await cancel(orderId);
+      console.log(res);
+      this.currentPage = 1;
+      this.currentPageSize = 10;
+      if (res.code === 1) {
+        this.initData(this.currentPage, this.currentPageSize);
+      }
+    },
+    async cancelOrder(orderId) {
+      await this.$confirm('确定要取消订单吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.downOrderNext(orderId);
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        });
+      });
+    },
     onDialogRegChange(val) {
       this.dialogDegShowOrHide = val; // 4
     },
@@ -206,8 +231,10 @@ export default {
     async receiveFunConfim(orderId) {
       let res = await receive(orderId);
       console.log(res);
+      this.currentPage = 1;
+      this.currentPageSize = 10;
       if (res.code === 1) {
-        this.initData(1, 10);
+        this.initData(this.currentPage, this.currentPageSize);
       }
     },
     receiveFun(orderId) {
@@ -260,17 +287,28 @@ export default {
       if (status === '') {
         status = 5;
       }
-      let res = await findinfoordersself({
-        'minTime': this.datePicker[0] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[0]) : '',
-        'maxTime': this.datePicker[1] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[1]) : '',
-        'pageSize': pageSize,
-        'pageNo': pageNo,
-        'parmValue': this.parmValue,
-        'userId': getStore('userId'),
-        'orderStatus': status
-      });
-      console.log(res);
-      console.log(this.datePicker);
+      let res;
+      if (this.datePicker instanceof Array) {
+        res = await findinfoordersself({
+          'minTime': this.datePicker[0] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[0]) : '',
+          'maxTime': this.datePicker[1] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[1]) : '',
+          'pageSize': pageSize,
+          'pageNo': pageNo,
+          'parmValue': this.parmValue,
+          'userId': getStore('userId'),
+          'orderStatus': status
+        });
+      } else {
+        res = await findinfoordersself({
+          'minTime': '',
+          'maxTime': '',
+          'pageSize': pageSize,
+          'pageNo': pageNo,
+          'parmValue': this.parmValue,
+          'userId': getStore('userId'),
+          'orderStatus': status
+        });
+      }
       if (res.code === 0) {
         this.tableData = res.data;
         this.count = res.totalSize;

@@ -48,12 +48,13 @@ export default {
               show: true
             },
             magicType: {
-              type: ['bar', 'line']// , 'stack', 'tiled'
+              type: ['bar', 'line'] // , 'stack', 'tiled'
             },
             saveAsImage: {
               show: true
             },
-            restore: {}
+            // 还原
+            restore: {show: true}
           }
         },
         xAxis: {

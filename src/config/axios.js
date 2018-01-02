@@ -38,6 +38,7 @@ export default async (url = '', data = {}, type = 'GET') => {
         timeout: 10000,
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
+          'X-Frame-Options': 'DENY', // 告诉浏览器不要（DENY）把这个网页放在iFrame内，通常的目的就是要帮助用户对抗点击劫持。
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
         }
       }).then((response) => {

@@ -53,7 +53,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this.selectTable, this.dialogShowOrHide);
+    // console.log(this.selectTable, this.dialogShowOrHide);
   },
   watch: {
     dialogShowOrHide: function(val, oldVal) { // 2

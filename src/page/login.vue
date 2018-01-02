@@ -7,16 +7,20 @@
       </div>
       <el-form :model="loginForm" :rules="rules" ref="loginForm">
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" placeholder="用户名"></el-input>
+          <el-input v-model="loginForm.username" placeholder="用户名" :maxlength="15"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input type="password" placeholder="密码" v-model="loginForm.password" @keyup.enter.native="submitForm('loginForm')"></el-input>
+          <el-input type="password" placeholder="密码" :maxlength="12" v-model="loginForm.password" @keyup.enter.native="submitForm('loginForm')"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('loginForm')" class="submit_btn">登录</el-button>
         </el-form-item>
       </el-form>
-      <p class="tip"><a class="forget-the-password" @click="forgetPassword"><i class="el-icon-arrow-left"></i>忘记密码</a><a class="register" @click="registerfun">注册<i class="el-icon-arrow-right"></i></a></p>
+      <p class="tip">
+        <a class="register" @click="forgetPassword">忘记密码?</a>
+        <!-- <a class="forget-the-password" @click="forgetPassword"><i class="el-icon-arrow-left"></i>忘记密码</a> -->
+        <!-- <a class="register" @click="registerfun">注册<i class="el-icon-arrow-right"></i></a> -->
+      </p>
     </section>
   </transition>
   <register v-show="registerShow" :regShow="registerShow" @myevent="regdialog"></register>
@@ -89,7 +93,7 @@ export default {
             phone: this.loginForm.username,
             password: this.loginForm.password
           });
-          console.log(res);
+          // console.log(res);
           if (res.code === 0) {
             this.$message({
               type: 'success',
@@ -100,10 +104,12 @@ export default {
             setStore('userId', res.data.doctorId);
             this.$router.push('manage');
           } else {
-            this.$message({
-              type: 'error',
-              message: '出错了'
-            });
+            if (res.code === -102) {} else {
+              this.$message({
+                type: 'error',
+                message: '出错了'
+              });
+            }
           }
         } else {
           this.$notify.error({
@@ -116,9 +122,9 @@ export default {
       });
     },
     registerfun() {
-      console.log(this.registerShow);
+      // console.log(this.registerShow);
       this.registerShow = true;
-      console.log(this.registerShow);
+      // console.log(this.registerShow);
     },
     regdialog(val) {
       this.registerShow = val;

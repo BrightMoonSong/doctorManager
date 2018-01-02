@@ -1,7 +1,7 @@
 <template>
 <div class="box">
   <div class="welcome" v-if="barshow">
-    <h2>欢迎使用医生管理系统</h2>
+    <h2 style="font-weight: 500;font-size: 36px;">欢迎使用医生管理系统</h2>
   </div>
   <div v-if="!barshow">
     <!-- <div v-drag>我可以拖拽</div> -->
@@ -52,7 +52,7 @@ import qrc from '../common/qrcode';
 export default {
   data() {
     return {
-      barshow: false,
+      barshow: true,
       qrcShow: false,
       Website: 'http://www.baidu.com',
       objCount: {},

@@ -28,7 +28,7 @@ export const signout = () => http('/dapi/shiro/logout', {}, 'DELETE');
  * 医生注册
  */
 
-export const shiroreg = data => http('/dapi/shiro/reg?phone=' + data.phone + '&smsCode=' + data.smsCode + '&password=' + data.password, {}, 'POST');
+export const shiroreg = data => http('/dapi/shiro/reg?phone=' + data.phone + '&smsCode=' + data.smsCode + '&password=' + data.password + '&recommendPhone=' + data.recommendPhone, {}, 'POST');
 
 /**
  * 医生修改密码
@@ -205,6 +205,20 @@ export const getlogisticsdoctororder = data => http('/dapi/doctororders/getlogis
 export const receive = data => http('/dapi/doctororders/receive?orderId=' + data, {}, 'PUT');
 
 /**
+ * 医生备货订单
+ * 未发货地订单  取消订单
+ */
+
+export const cancel = data => http('/dapi/doctororders/cancel?orderId=' + data, {}, 'PUT');
+
+/**
+ * 我的订单相关
+ * 未支付订单  取消订单
+ */
+
+export const ordercancel = data => http('/dapi/orders/cancel?orderId=' + data, {}, 'PUT');
+
+/**
  * 模拟微信扫码支付获取二维码链接接口
  */
 
@@ -215,3 +229,24 @@ export const getpaycode = data => http('/dapi/orders/getpaycode?orderId=' + data
  */
 
 export const getpaystatus = data => http('/dapi/orders/getpaystatus?orderId=' + data);
+
+/**
+ * 医生收益管理
+ * 获取结算订单列表
+ */
+
+export const doctorprofitinfos = data => http('/dapi/doctorprofit/findinfos?parmValue=' + data.parmValue + '&year=' + data.year + '&month=' + data.month + '&pageSize=' + data.pageSize + '&pageNo=' + data.pageNo + '&type=' + data.type);
+
+/**
+ * 医生收益管理
+ * 获取推广注册收益列表
+ */
+
+export const recommendinfos = data => http('/dapi/doctorprofit/recommendinfos?parmValue=' + data.parmValue + '&year=' + data.year + '&month=' + data.month + '&pageSize=' + data.pageSize + '&pageNo=' + data.pageNo + '&type=' + data.type);
+
+/**
+ * 医生收益管理
+ * 获取推广注册收益列表
+ */
+
+export const recommendorders = data => http('/dapi/doctorprofit/recommendorders?parmValue=' + data.parmValue + '&year=' + data.year + '&month=' + data.month + '&pageSize=' + data.pageSize + '&pageNo=' + data.pageNo + '&type=' + data.type);

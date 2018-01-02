@@ -8,11 +8,11 @@
           <el-tab-pane label="基本信息">
             <ul>
               <li>
-                <span>姓名：</span>
-                <el-input style="width:50%;" v-model="dataInfo.doctorName" :disabled="editStart" placeholder="请输入姓名"></el-input>
+                <span style="text-align: right;">姓名：</span>
+                <el-input style="width:50%;" v-model="dataInfo.doctorName" :maxlength="15" :disabled="editStart" placeholder="请输入姓名"></el-input>
               </li>
               <li>
-                <span>类型：</span>
+                <span style="text-align: right;">类型：</span>
                 <!-- <el-input style="width:50%;" v-model="dataInfo.type" :disabled="editStart" placeholder="请输入类型"></el-input> -->
                 <el-select style="width:50%;" v-model="dataInfo.type" :disabled="editStart" placeholder="请选择类型">
                   <el-option v-for="item in typeList" :key="item.typeId" :label="item.typeName" :value="item.typeId">
@@ -20,19 +20,19 @@
                 </el-select>
               </li>
               <li>
-                <span>性别：</span>
+                <span style="text-align: right;">性别：</span>
                 <el-radio v-model="dataInfo.gender" :disabled="editStart" :label="1">男</el-radio>
                 <el-radio v-model="dataInfo.gender" :disabled="editStart" :label="2">女</el-radio>
               </li>
               <li>
-                <span>出生日期：</span>
+                <span style="text-align: right;">出生日期：</span>
                 <el-date-picker v-model="dataInfo.birthday" :disabled="editStart" type="date" :picker-options="pickerOptions1" placeholder="选择出生日期">
                 </el-date-picker>
               </li>
               <li>
-                <span>所在地区：</span>
+                <span style="text-align: right;">所在地区：</span>
                 <!-- <el-cascader :options="options2" :disabled="editStart" @change="adresscas" v-model="basicProCityDistrict"></el-cascader> -->
-                <el-cascader :disabled="editStart" filterable placeholder="选择所在地区" @change="adresscas" :options="selectList" v-model="basicProCityDistrict" @active-item-change="handleItemChange" :props="props"></el-cascader>
+                <el-cascader :disabled="editStart" placeholder="选择所在地区" @change="adresscas" :options="selectList" v-model="basicProCityDistrict" @active-item-change="handleItemChange" :props="props"></el-cascader>
               </li>
               <li class="headerImg">
                 <span style="vertical-align: top;">头像：</span>
@@ -46,27 +46,27 @@
           <el-tab-pane label="联系方式">
             <ul>
               <li>
-                <span>手机：</span>
-                <el-input style="width:50%;" v-model="dataInfo.phone" :disabled="editStart" placeholder="请输入手机号码"></el-input>
+                <span style="text-align: right;">手机：</span>
+                <el-input style="width:50%;" v-model="dataInfo.phone" :maxlength="11" :disabled="editStart" placeholder="请输入手机号码"></el-input>
               </li>
               <li>
-                <span>座机：</span>
-                <el-input style="width:50%;" v-model="dataInfo.telPhone" :disabled="editStart" placeholder="请输入座机号码"></el-input>
+                <span style="text-align: right;">座机：</span>
+                <el-input style="width:50%;" v-model="dataInfo.telPhone" :maxlength="13" :disabled="editStart" placeholder="请输入座机号码"></el-input>
               </li>
               <li>
-                <span>详细地址：</span>
-                <el-input style="width:50%;" v-model="dataInfo.addressDetail" :disabled="editStart" placeholder="请输入详细地址"></el-input>
+                <span style="text-align: right;">详细地址：</span>
+                <el-input style="width:50%;" v-model="dataInfo.addressDetail" :maxlength="50" :disabled="editStart" placeholder="请输入详细地址"></el-input>
               </li>
               <li>
-                <span>所属服务机构：</span>
-                <el-input style="width:50%;" v-model="dataInfo.serviceAgencies" :disabled="editStart" placeholder="请输入所属服务机构"></el-input>
+                <span style="text-align: right;">所属服务机构：</span>
+                <el-input style="width:50%;" v-model="dataInfo.serviceAgencies" :maxlength="30" :disabled="editStart" placeholder="请输入所属服务机构"></el-input>
               </li>
             </ul>
           </el-tab-pane>
           <el-tab-pane label="证件信息">
             <ul>
-              <li class="el-col el-col-8">
-                <span>医师资格证：</span>
+              <li class="el-col el-col-12" style="text-align: center;">
+                <span>医疗机构执业许可证：</span>
                 <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg1" :before-upload="beforeImgUpload">
                   <img v-if="imgUrl1" :src="imgUrl1" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -77,8 +77,8 @@
                   </el-date-picker>
                 </div>
               </li>
-              <li class="el-col el-col-8">
-                <span>执业医师证：</span>
+              <li class="el-col el-col-12" style="text-align: center;">
+                <span>医师证：</span>
                 <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg2" :before-upload="beforeImgUpload">
                   <img v-if="imgUrl2" :src="imgUrl2" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -89,7 +89,7 @@
                   </el-date-picker>
                 </div>
               </li>
-              <li class="el-col el-col-8">
+              <!-- <li class="el-col el-col-8">
                 <span>健康证：</span>
                 <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg3" :before-upload="beforeImgUpload">
                   <img v-if="imgUrl3" :src="imgUrl3" class="avatar">
@@ -100,7 +100,7 @@
                   <el-date-picker :disabled="editStart" style="width: 170px;" v-model="validityDate3" type="date" placeholder="证件截止有效期">
                   </el-date-picker>
                 </div>
-              </li>
+              </li> -->
               <li style="clear:both;padding: 0;"></li>
             </ul>
           </el-tab-pane>
@@ -124,29 +124,28 @@
       <div class="admin_set" v-show="bankLengthShow">
         <ul>
           <li>
-            <span>开户银行：</span>
-            <!-- <span v-text="bankList.bank"></span> -->
-            <el-input style="width:55%;" v-model="bankList.bank" :disabled="editStart1" placeholder="请输入开户银行名称"></el-input>
-          </li>
-          <li>
-            <span>开户地址：</span>
-            <!-- <el-cascader :options="options2" :disabled="editStart1" v-model="bankList.registrationAddress"></el-cascader> -->
-            <el-cascader :disabled="editStart1" filterable placeholder="选择开户地址" :options="selectList" v-model="bankList.registrationAddress" @active-item-change="handleItemChange" :props="props"></el-cascader>
-          </li>
-          <li>
-            <span>支行名称：</span>
-            <el-input style="width:55%;" v-model="bankList.registrationBank" :disabled="editStart1" placeholder="请输入支行名称"></el-input>
-          </li>
-          <li>
-            <span>银行账号：</span>
+            <span style="text-align: right;">银行账号：</span>
             <el-input style="width:55%;" @blur="cardNoBlur" v-model="bankList.cardNo" :disabled="editStart1" placeholder="请输入银行账号"></el-input>
+          </li>
+          <li>
+            <span style="text-align: right;">开户银行：</span>
+            <el-input style="width:55%;" v-model="bankList.bank" :maxlength="25" :disabled="editStart1" placeholder="请输入开户银行名称"></el-input>
+          </li>
+          <li>
+            <span style="text-align: right;">开户地址：</span>
+            <el-input style="width:55%;" v-model="bankList.registrationAddress" :maxlength="50" :disabled="editStart1" placeholder="请输入开户地址"></el-input>
+            <!-- <el-cascader :disabled="editStart1" filterable placeholder="选择开户地址" :options="selectList" v-model="bankList.registrationAddress" @active-item-change="handleItemChange" :props="props"></el-cascader> -->
+          </li>
+          <li>
+            <span style="text-align: right;">支行名称：</span>
+            <el-input style="width:55%;" v-model="bankList.registrationBank" :maxlength="30" :disabled="editStart1" placeholder="请输入支行名称"></el-input>
           </li>
         </ul>
       </div>
     </div>
     <el-row :gutter="20" style="margin-top: 10px;margin-bottom: 10px;">
       <el-col :span="4" :offset="9" style="min-width:350px;">
-        <el-button type="primary" style="width:100%;" icon="el-icon-plus" v-show="!bankLengthShow" @click="bankLengthShow = true;editStart1=false" plain>添加</el-button>
+        <el-button type="primary" style="width:100%;" icon="el-icon-plus" v-show="!bankLengthShow" @click="addBank" plain>添加</el-button>
         <el-button type="primary" v-show="editStart1 && bankLengthShow" @click="editStates1(1)" plain>删除信息</el-button>
         <el-button type="primary" v-show="!editStart1 && bankLengthShow" @click="editStates1(2)" plain>提交</el-button>
         <el-button type="primary" v-show="!editStart1 && bankLengthShow" @click="editStates1(3)" plain>取消</el-button>
@@ -234,13 +233,14 @@ export default {
             'imgUrl': this.imgUrl2,
             'sort': 1,
             'validityDate': ''
-          },
-          {
-            'cardType': 3,
-            'imgUrl': this.imgUrl3,
-            'sort': 1,
-            'validityDate': ''
           }
+          // ,
+          // {
+          //   'cardType': 3,
+          //   'imgUrl': this.imgUrl3,
+          //   'sort': 1,
+          //   'validityDate': ''
+          // }
         ],
         'doctorId': getStore('userId')
       },
@@ -252,7 +252,7 @@ export default {
       bankList: {
         'doctorId': getStore('userId'),
         'bank': '',
-        'registrationAddress': [],
+        'registrationAddress': '',
         'registrationBank': '',
         'cardNo': ''
       },
@@ -293,6 +293,24 @@ export default {
     // }, 4200);
   },
   methods: {
+    addBank() {
+      if (this.dataInfoShow) {
+        this.$message({
+          type: 'error',
+          message: '审核中时银行卡信息不可更改'
+        });
+        return;
+      }
+      if (this.dataInfoShow1) {
+        this.$message({
+          type: 'error',
+          message: '审核未通过时银行卡信息不可更改'
+        });
+        return;
+      }
+      this.bankLengthShow = true;
+      this.editStart1 = false
+    },
     async initType() {
       let res = await findtypenames();
       this.typeList = res.data;
@@ -417,12 +435,28 @@ export default {
       }
     },
     async beforeImgUpload(file) {
+      // "jpg,gif,png,bmp"
+      const isJPG = file.type === 'image/jpeg';
+      const isPNG = file.type === 'image/png';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (isJPG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.jpg';
+      }
+      if (isPNG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.png';
+      }
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
+        return false;
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+        return false;
+      }
       let res = await this.initGetSign();
       if (res) {
-        // "jpg,gif,png,bmp"
-        const isJPG = file.type === 'image/jpeg';
-        const isPNG = file.type === 'image/png';
-        const isLt2M = file.size / 1024 / 1024 < 2;
         var oDate = new Date(); // 实例一个时间对象；
         var yearSec = '' + oDate.getFullYear() + (oDate.getMonth() + 1) + oDate.getDate() + oDate.getHours() + oDate.getMinutes() + oDate.getSeconds();
         var rand = '';
@@ -430,23 +464,8 @@ export default {
           var r = Math.floor(Math.random() * 10);
           rand += r;
         }
-        this.dataFileName = 'dev/carmodel/' + yearSec + rand + '.jpg';
+        this.dataFileName = 'dev/doctor/' + yearSec + rand + '.jpg';
         this.dataObject.key = this.dataFileName;
-        if (isJPG) {
-          let arr = this.dataFileName.split('.');
-          this.dataFileName = arr[0] + '.jpg';
-        }
-        if (isPNG) {
-          let arr = this.dataFileName.split('.');
-          this.dataFileName = arr[0] + '.png';
-        }
-        if (!isJPG && !isPNG) {
-          this.$message.error('上传头像图片只能是 JPG或者PNG 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-        return (isJPG || isPNG) && isLt2M;
       } else {
         return false;
       }
@@ -488,13 +507,7 @@ export default {
       this.dataInfo = obj;
       if (obj) {
         if (obj.bankCardList.length > 0) {
-          let dataO = obj.bankCardList[obj.bankCardList.length - 1];
-          let arrBank = dataO.registrationAddress.split('/');
-          dataO.registrationAddress = [Number(arrBank[0]), Number(arrBank[1]), Number(arrBank[2])];
-          await this.handleItemChange([dataO.registrationAddress[0]]);
-          await this.handleItemChange([dataO.registrationAddress[0], dataO.registrationAddress[1]]);
-          await this.handleItemChange([dataO.registrationAddress[0], dataO.registrationAddress[1], dataO.registrationAddress[2]]);
-          this.bankList = dataO;
+          this.bankList = obj.bankCardList[obj.bankCardList.length - 1];
           this.bankLengthShow = true;
         } else {
           this.bankLengthShow = false;
@@ -508,7 +521,7 @@ export default {
       await this.handleItemChange([this.basicProCityDistrict0, this.basicProCityDistrict1, this.basicProCityDistrict2]);
       this.basicProCityDistrict = [this.basicProCityDistrict0, this.basicProCityDistrict1, this.basicProCityDistrict2];
       if (this.dataInfo.cardList.length > 0) {
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < 2; i++) {
           switch (this.dataInfo.cardList[i].cardType) {
             case 1:
               this.imgUrl1 = this.dataInfo.cardList[i].imgUrl;
@@ -535,13 +548,14 @@ export default {
             'imgUrl': this.imgUrl2,
             'sort': 1,
             'validityDate': this.validityDate2
-          },
-          {
-            'cardType': 3,
-            'imgUrl': this.imgUrl3,
-            'sort': 1,
-            'validityDate': this.validityDate3
           }
+          // ,
+          // {
+          //   'cardType': 3,
+          //   'imgUrl': this.imgUrl3,
+          //   'sort': 1,
+          //   'validityDate': this.validityDate3
+          // }
         ]
       }
     },
@@ -559,6 +573,18 @@ export default {
           this.dataInfo.province = this.basicProCityDistrict0;
           this.dataInfo.city = this.basicProCityDistrict1;
           this.dataInfo.district = this.basicProCityDistrict2;
+          if (!this.dataInfo.district) {
+            this.$message.error('省市区是必填项！');
+            return false;
+          }
+          if (!this.imgUrl1) {
+            this.$message.error('医疗机构执业许可证必须上传！');
+            return false;
+          }
+          if (!this.imgUrl2) {
+            this.$message.error('医师证必须上传！');
+            return false;
+          }
           this.dataInfo.cardList = [{
               'cardType': 1,
               'imgUrl': this.imgUrl1,
@@ -570,14 +596,22 @@ export default {
               'imgUrl': this.imgUrl2,
               'sort': 1,
               'validityDate': this.validityDate2
-            },
-            {
-              'cardType': 3,
-              'imgUrl': this.imgUrl3,
-              'sort': 1,
-              'validityDate': this.validityDate3
             }
           ];
+          if (!this.dataInfo.phone) {
+            this.$message.error('手机号是必填项！');
+            return false;
+          }
+          if (!(/^1[34578]\d{9}$/.test(this.dataInfo.phone))) {
+            this.$message.error('手机号格式不正确！');
+            return false;
+          }
+          if (this.dataInfo.telPhone) {
+            if (!(/^([0-9]{3,4}-)?[0-9]{7,8}$/.test(this.dataInfo.telPhone))) {
+              this.$message.error('座机号格式不正确！');
+              return false;
+            }
+          }
           const res = await uploadverifyinfo(this.dataInfo);
           if (res.code === 1) {
             this.editStart = true;
@@ -587,6 +621,7 @@ export default {
           break;
         case 3:
           this.editStart = true;
+          this.initEnty();
           break;
         case 4:
           this.onDialogChange(true);
@@ -596,6 +631,20 @@ export default {
       }
     },
     async editStates1(n) { // 添加银行卡信息
+      if (this.dataInfoShow) {
+        this.$message({
+          type: 'error',
+          message: '审核中时银行卡信息不可更改'
+        });
+        return;
+      }
+      if (this.dataInfoShow1) {
+        this.$message({
+          type: 'error',
+          message: '审核未通过时银行卡信息不可更改'
+        });
+        return;
+      }
       switch (n) {
         case 1:
           this.editStart1 = false;
@@ -606,7 +655,7 @@ export default {
           this.bankList = {
             'doctorId': getStore('userId'),
             'bank': '',
-            'registrationAddress': [],
+            'registrationAddress': '',
             'registrationBank': '',
             'cardNo': ''
           };
@@ -616,7 +665,7 @@ export default {
           let dataObj = {
             'doctorId': this.bankList.doctorId,
             'bank': this.bankList.bank,
-            'registrationAddress': this.bankList.registrationAddress[0] + '/' + this.bankList.registrationAddress[1] + '/' + this.bankList.registrationAddress[2],
+            'registrationAddress': this.bankList.registrationAddress,
             'registrationBank': this.bankList.registrationBank,
             'cardNo': this.bankList.cardNo
           };
@@ -633,7 +682,7 @@ export default {
             this.bankList = {
               'doctorId': getStore('userId'),
               'bank': '',
-              'registrationAddress': [],
+              'registrationAddress': '',
               'registrationBank': '',
               'cardNo': ''
             };
@@ -698,8 +747,7 @@ export default {
     }
     li > span:first-child {
         display: inline-block;
-        width: 115px;
-        text-align: right;
+        width: 165px;
     }
 }
 .admin_set {

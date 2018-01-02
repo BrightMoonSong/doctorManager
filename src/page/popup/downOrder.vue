@@ -64,7 +64,7 @@ import {
 } from '@/api/getData';
 import {
   removeForIndex,
-  setStore,
+  // setStore,
   getStore
 } from '@/config/mUtils';
 
@@ -99,7 +99,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this.selectTable, this.downifShow);
+    // console.log(this.selectTable, this.downifShow);
   },
   watch: {
     downifShow: function(val, oldVal) { // 2
@@ -111,7 +111,7 @@ export default {
   },
   methods: {
     async okDownOrder() {
-      console.log('最终的确认下单！');
+      // console.log('最终的确认下单！');
       let obj = {
         'doctorId': getStore('userId'),
         'orderAddressVo': {
@@ -138,15 +138,17 @@ export default {
         val.goodsName = val.name1;
         val.price = val.salesPrice;
       });
-      console.log(obj);
+      // console.log(obj);
       let res = await cartsubmit(obj);
-      console.log(res);
+      // console.log(res);
       if (res.code === 1) {
         this.downifShowThis = false;
-        setStore('orderId', res.data);
+        // setStore('orderId', res.data);
         // this.$router.push('/qrcode');
         // 跳转到 中间 页面等待审核通过去支付
-        this.$router.push('/centerpay');
+        // this.$router.push('/centerpay');
+        // 跳转到我的订单页面
+        this.$router.push('/myOrder');
       }
     },
     deleteRow(scope) {

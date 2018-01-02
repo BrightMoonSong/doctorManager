@@ -2,18 +2,18 @@
   <el-dialog title="忘记密码" align="center" top="20vh" width="450px" :visible.sync="forgetpShowThis">
     <el-form :model="forgetForm" :rules="rules2" ref="forgetForm">
       <el-form-item prop="phone">
-        <el-input v-model="forgetForm.phone" placeholder="手机号"></el-input>
+        <el-input v-model="forgetForm.phone" placeholder="手机号" :maxlength="11"></el-input>
       </el-form-item>
       <el-form-item prop="smsCode">
-        <el-input placeholder="验证码" v-model="forgetForm.smsCode" class="input-with-select">
+        <el-input placeholder="验证码" v-model="forgetForm.smsCode" :maxlength="6" class="input-with-select">
           <el-button slot="append" v-text="sendText" @click="sendsms"></el-button>
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input type="password" placeholder="密码" v-model="forgetForm.password"></el-input>
+        <el-input type="password" placeholder="新密码" :maxlength="12" v-model="forgetForm.password"></el-input>
       </el-form-item>
       <el-form-item prop="password2">
-        <el-input type="password" placeholder="再次输入密码" v-model="forgetForm.password2"></el-input>
+        <el-input type="password" placeholder="再次输入密码" :maxlength="12" v-model="forgetForm.password2"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('forgetForm')" class="submit_btn">提交</el-button>
@@ -116,7 +116,7 @@ export default {
           } else {
             let res = await send({
               'phone': this.forgetForm.phone,
-              'type': 2
+              'type': 3
             });
             if (res.code === 0) {
               this.sendText = '60秒';

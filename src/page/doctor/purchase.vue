@@ -6,11 +6,11 @@
           :options="selectList" v-model="cateIdList"
           @active-item-change="handleItemChange"
           :props="props"
-          filterable
+          clearable
         ></el-cascader>
       </div>
       <div class="el-col el-col-6" style="margin: 15px;">
-        <el-input placeholder="关键词检索" v-model="parmValue" class="input-with-select">
+        <el-input placeholder="关键词检索" :maxlength="18" v-model="parmValue" class="input-with-select">
           <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
         </el-input>
       </div>
@@ -23,7 +23,7 @@
           show-overflow-tooltip
           align="center">
           <template slot-scope="scope">
-            <img :src="scope.row.masterImg" @click="clickImg(scope.row.masterImg)" alt="..." width="50">
+            <img v-bigimg="scope.row.masterImg" :src="scope.row.masterImg" @click="clickImg(scope.row.masterImg)" alt="..." width="50">
           </template>
         </el-table-column>
         <el-table-column
@@ -31,6 +31,14 @@
           show-overflow-tooltip
           label="商品名称"
           align="center">
+        </el-table-column>
+        <el-table-column
+          show-overflow-tooltip
+          label="商品类型"
+          align="center">
+          <template slot-scope="scope">
+            <span>{{goodsTypeList[scope.row.goodsType-1]}}</span>
+          </template>
         </el-table-column>
         <el-table-column
           prop="name2"
@@ -84,7 +92,7 @@
           show-overflow-tooltip
           align="center">
           <template slot-scope="scope">
-            <img :src="scope.row.masterImg" @click="clickImg(scope.row.masterImg)" alt="..." width="50">
+            <img v-bigimg="scope.row.masterImg" :src="scope.row.masterImg" @click="clickImg(scope.row.masterImg)" alt="..." width="50">
           </template>
         </el-table-column>
         <el-table-column
@@ -92,6 +100,14 @@
           show-overflow-tooltip
           label="商品名称"
           align="center">
+        </el-table-column>
+        <el-table-column
+          show-overflow-tooltip
+          label="商品类型"
+          align="center">
+          <template slot-scope="scope">
+            <span>{{goodsTypeList[scope.row.goodsType-1]}}</span>
+          </template>
         </el-table-column>
         <el-table-column
           prop="name2"
@@ -145,13 +161,13 @@
       </div>
       <div class="drugsTotal">
         <span class="el-col el-col-5" style="text-align: right;line-height:40px;">收货人：</span>
-        <el-input style="width:50%;" v-model="receiveObj.receiveName" placeholder="请输入收货人姓名"></el-input><br /><br />
+        <el-input style="width:50%;" v-model="receiveObj.receiveName" :maxlength="15" placeholder="请输入收货人姓名"></el-input><br /><br />
         <span class="el-col el-col-5" style="text-align: right;line-height:40px;">联系方式：</span>
-        <el-input style="width:50%;" v-model="receiveObj.receivePhone" placeholder="请输入联系方式"></el-input><br /><br />
+        <el-input style="width:50%;" v-model="receiveObj.receivePhone" :maxlength="11" placeholder="请输入联系方式"></el-input><br /><br />
         <span class="el-col el-col-5" style="text-align: right;line-height:40px;">收货地址：</span>
-        <el-input style="width:50%;" v-model="receiveObj.receiveAddress" placeholder="请输入收货地址"></el-input><br /><br />
+        <el-input style="width:50%;" v-model="receiveObj.receiveAddress" :maxlength="35" placeholder="请输入收货地址"></el-input><br /><br />
         <span class="el-col el-col-5" style="text-align: right;line-height:40px;">留言：</span>
-        <el-input style="width:50%;" v-model="receiveObj.remark" placeholder="请输入备注信息"></el-input><br /><br />
+        <el-input style="width:50%;" v-model="receiveObj.remark" :maxlength="55" placeholder="请输入备注信息"></el-input><br /><br />
         <div class="el-col el-col-24" style="text-align: center;">
           <el-button type="success" size="medium" round @click="onSubmit(true)">确认下单</el-button>
           <el-button type="warning" size="medium" round @click="onSubmit(false)">取消</el-button>
@@ -166,6 +182,7 @@
 import {
   findinfos,
   getinfo,
+  findareabypid,
   findinfosbypid,
   getinfoforgoods,
   cartsubmitself
@@ -184,6 +201,7 @@ export default {
     return {
       selectTable: [],
       baseUrl,
+      goodsTypeList: ['处方药', '非处方药', '其他'],
       receiveObj: {},
       baseImgPath,
       totalPrice: 0,
@@ -193,7 +211,6 @@ export default {
       dialogShowOrHide: false,
       dialogDegShowOrHide: false,
       count: 0,
-      showImg: false,
       currentPage: 1,
       currentPageSize: 10,
       selectList: [],
@@ -213,6 +230,11 @@ export default {
       totalCredit: 0,
       dataObject: {},
       userSearched: {},
+      areaList: {
+        province: '',
+        city: '',
+        district: ''
+      },
       outerVisible: false,
       innerVisible: false
     };
@@ -224,9 +246,36 @@ export default {
     this.doctorInfo();
   },
   methods: {
+    async areaName(id, comId, n, m) {
+      let res = await findareabypid(id);
+      if (res.code >= 0) {
+        res.data.forEach(val => {
+          if (val.areaId === comId) {
+            switch (n) {
+              case 1:
+                this.areaList.province = val.name;
+                break;
+              case 2:
+                this.areaList.city = val.name;
+                break;
+              default:
+                this.areaList.district = val.name;
+                let str = this.areaList.province + this.areaList.city + this.areaList.district + m;
+                this.$set(this.receiveObj, 'receiveAddress', str);
+            }
+          }
+        });
+      }
+    },
     async doctorInfo() {
       let res = await getinfo();
       if (res.code === 0) {
+        this.receiveObj.receiveName = res.data.doctorName;
+        this.receiveObj.receivePhone = res.data.phone;
+        // this.receiveObj.receiveAddress = res.data.addressDetail;
+        this.areaName(0, res.data.province, 1);
+        this.areaName(res.data.province, res.data.city, 2);
+        this.areaName(res.data.city, res.data.district, 3, res.data.addressDetail);
         this.totalCredit = res.data.credits;
       }
     },
@@ -293,6 +342,9 @@ export default {
       });
     },
     async initData(pageNo, pageSize) {
+      if (this.cateIdList.length === 0) {
+        this.categoryId = '';
+      }
       let res = await findinfos({
         'pageSize': pageSize,
         'pageNo': pageNo,
@@ -327,18 +379,33 @@ export default {
     },
     async onSubmit(boolean) {
       if (boolean) {
-        await this.$confirm('请仔细核对信息，确定提交吗?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.downOrderNext();
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
+        if (this.selectedGoods.length === 0) {
+          this.$notify.error({
+            title: '亲,您还没有选择药品哦',
+            message: '请点击表格前面的小方框并确认选择'
           });
-        });
+          return false;
+        }
+        if (this.receiveObj.receiveAddress && this.receiveObj.receiveName && this.receiveObj.receivePhone) {
+          if (!(/^1[34578]\d{9}$/.test(this.receiveObj.receivePhone))) {
+            this.$message.error('手机号格式不正确！');
+            return false;
+          }
+          await this.$confirm('请仔细核对信息，确定提交吗?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.downOrderNext();
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消'
+            });
+          });
+        } else {
+          this.$message.error('收货人姓名、联系方式、收货地址缺一不可！');
+        }
       } else {
         // 取消下单
         this.toggleSelection(false);
@@ -358,7 +425,6 @@ export default {
     },
     async handleClick(row, index) {
       let res = await getinfoforgoods(row.goodsId);
-      console.log(res);
       if (res.code === 0) {
         this.selectTable = res.data;
         this.dialogShowOrHide = true;
@@ -383,7 +449,15 @@ export default {
         // 药品类型：1：处方药   2：非处方    3：其它 goodsType
         if (this.multipleSelection.length > 0) {
           this.multipleSelection.forEach((val, index) => {
-            this.selectedGoods.push(val);
+            let a = 1;
+            this.selectedGoods.forEach((m, i) => {
+              if (m.goodsId === val.goodsId) {
+                a = 2;
+              }
+            });
+            if (a === 1) {
+              this.selectedGoods.push(val);
+            }
           });
         } else {
           this.$notify.error({
@@ -396,15 +470,8 @@ export default {
       }
     },
     deleteRow(scope) {
+      this.selectedGoods[scope.$index].count = 1;
       this.selectedGoods = removeForIndex(this.selectedGoods, scope.$index);
-    },
-    clickImg(src) {
-      this.showImg = true;
-      // 获取当前图片地址
-      this.bigImgSrc = src;
-    },
-    viewImg() {
-      this.showImg = false;
     }
   },
   components: {

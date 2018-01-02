@@ -1,7 +1,7 @@
 <template lang="html">
 <div class="box">
   <div class="el-col el-col-4" style="padding: 5px;padding-left: 0px;">
-    <el-input v-model="parmValue" placeholder="关键词检索"></el-input>
+    <el-input v-model="parmValue" :maxlength="18" placeholder="关键词检索"></el-input>
   </div>
   <div class="el-col el-col-4" style="padding: 5px;">
     <el-select v-model="orderStatus" style="width:100%" clearable placeholder="订单状态">
@@ -14,7 +14,7 @@
     </el-select>
   </div>
   <div class="el-col el-col-8" style="padding: 5px;width:400px;padding-left: 0px;">
-    <el-date-picker
+    <el-date-picker :editable="false"
       v-model="datePicker"
       type="datetimerange"
       :picker-options="pickerOptions2"
@@ -74,6 +74,7 @@
       <template slot-scope="scope">
         <el-button @click="ordersdetailbyid(scope.row)" type="text" size="small">查看</el-button>
         <el-button v-show="scope.row.orderStatus===2" @click="payJump(scope.row.orderId)" type="text" size="small">去支付</el-button>
+        <el-button @click="cancelOrder(scope.row.orderId)" type="text" size="small" v-if="0<scope.row.orderStatus&&scope.row.orderStatus<3">取消订单</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -82,18 +83,21 @@
     </el-pagination>
   </div>
   <orderdetail :downifShow="dialogDegShowOrHide" :orderId="orderId" @dialog="onDialogRegChange"></orderdetail>
+  <dialogqrcode :showqr="dialogqrshow" :orderId="orderId" @dialog="onDialogqr"></dialogqrcode>
 </div>
 </template>
 
 <script>
 import {
-  ordersfindinfos
+  ordersfindinfos,
+  ordercancel
 } from '@/api/getData';
 import {
-  getStore,
-  setStore
+  getStore
+  // setStore
 } from '@/config/mUtils';
 import orderdetail from '@/page/popup/orderDetail';
+import dialogqrcode from '@/page/paycode/dialogqrcode';
 
 export default {
   data() {
@@ -101,6 +105,7 @@ export default {
       orderId: 0,
       parmValue: '',
       count: 0,
+      dialogqrshow: false,
       currentPage: 1,
       currentPageSize: 10,
       tableData: [],
@@ -114,9 +119,6 @@ export default {
       }, {
         value: '3',
         label: '待付款'
-      }, {
-        value: '4',
-        label: '待完成'
       }, {
         value: '5',
         label: '已完成'
@@ -156,15 +158,45 @@ export default {
     };
   },
   mounted() {
-    this.initData(1, 10);
+    this.initData(this.currentPage, this.currentPageSize);
   },
   components: {
-    orderdetail
+    orderdetail,
+    dialogqrcode
   },
   methods: {
+    async downOrderNext(orderId) {
+      let res = await ordercancel(orderId);
+      console.log(res);
+      this.currentPage = 1;
+      this.currentPageSize = 10;
+      if (res.code === 1) {
+        this.initData(this.currentPage, this.currentPageSize);
+      }
+    },
+    async cancelOrder(orderId) {
+      await this.$confirm('确定要取消订单吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.downOrderNext(orderId);
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        });
+      });
+    },
     payJump(orderId) {
-      setStore('orderId', orderId);
-      this.$router.push('/qrcode');
+      // setStore('orderId', orderId);
+      // this.$router.push('/qrcode');
+      this.orderId = orderId;
+      this.dialogqrshow = true;
+    },
+    onDialogqr(val) {
+      this.dialogqrshow = val; // 4
+      this.initData(this.currentPage, this.currentPageSize);
     },
     onDialogRegChange(val) {
       this.dialogDegShowOrHide = val; // 4
@@ -224,17 +256,28 @@ export default {
       return fmt;
     },
     async initData(pageNo, pageSize) {
-      let res = await ordersfindinfos({
-        'minTime': this.datePicker[0] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[0]) : '',
-        'maxTime': this.datePicker[1] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[1]) : '',
-        'pageSize': pageSize,
-        'pageNo': pageNo,
-        'parmValue': this.parmValue,
-        'userId': getStore('userId'),
-        'orderStatus': this.orderStatus
-      });
-      console.log(res);
-      console.log(this.datePicker);
+      let res;
+      if (this.datePicker instanceof Array) {
+        res = await ordersfindinfos({
+          'minTime': this.datePicker[0] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[0]) : '',
+          'maxTime': this.datePicker[1] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[1]) : '',
+          'pageSize': pageSize,
+          'pageNo': pageNo,
+          'parmValue': this.parmValue,
+          'userId': getStore('userId'),
+          'orderStatus': this.orderStatus
+        });
+      } else {
+        res = await ordersfindinfos({
+          'minTime': '',
+          'maxTime': '',
+          'pageSize': pageSize,
+          'pageNo': pageNo,
+          'parmValue': this.parmValue,
+          'userId': getStore('userId'),
+          'orderStatus': this.orderStatus
+        });
+      }
       if (res.code === 0) {
         this.tableData = res.data;
         this.count = res.totalSize;

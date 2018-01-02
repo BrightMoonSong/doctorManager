@@ -5,11 +5,10 @@
         :options="selectList" v-model="cateIdList"
         @active-item-change="handleItemChange"
         :props="props"
-        filterable
       ></el-cascader>
     </div>
     <div class="el-col el-col-6" style="margin: 15px;">
-      <el-input placeholder="关键词检索" v-model="parmValue" class="input-with-select">
+      <el-input placeholder="关键词检索" :maxlength="18" v-model="parmValue" class="input-with-select">
         <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
       </el-input>
     </div>
@@ -78,7 +77,7 @@
 
 <script>
 import {
-  findinfos,
+  findinfoself,
   findinfosbypid,
   getinfoforgoods
 } from '@/api/getData';
@@ -110,14 +109,16 @@ export default {
   mounted() {
     // 获取三级分类
     this.findinfosbypid();
-    this.initData(1, 10);
+    this.currentPage = 1;
+    this.currentPageSize = 10;
+    this.initData(this.currentPage, this.currentPageSize);
   },
   methods: {
     search() {
       if (this.cateIdList.length === 3) {
         this.categoryId = this.cateIdList[2];
       }
-      this.initData(1, 10);
+      this.initData(this.currentPage, this.currentPageSize);
     },
     async handleItemChange(val) {
       if (val.length === 3) {
@@ -184,7 +185,7 @@ export default {
       this.showImg = false;
     },
     async initData(pageNo, pageSize) {
-      let res = await findinfos({
+      let res = await findinfoself({
         'pageSize': pageSize,
         'pageNo': pageNo,
         'parmValue': this.parmValue,

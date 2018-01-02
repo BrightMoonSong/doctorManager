@@ -1,14 +1,14 @@
 <template>
-<el-dialog title="物流信息" top="5vh" :visible.sync="downifShowThis">
+<el-dialog title="物流信息" top="5vh" width="1000px" :visible.sync="downifShowThis">
   <el-form ref="form" label-width="100px" size="mini" v-show="getlogisticsData.Success&&!getlogisticsData.Reason">
     <el-form-item label="运单号：">
       <span v-text="getlogisticsData.LogisticCode" style="width: 75%;"></span>
     </el-form-item>
   </el-form>
-  <el-table v-show="getlogisticsData.Success&&!getlogisticsData.Reason" :data="getlogisticsData.Traces" stripe border style="width: 100%;">
-    <el-table-column prop="AcceptTime" align="center" show-overflow-tooltip label="时间">
+  <el-table v-show="getlogisticsData.Success&&!getlogisticsData.Reason" :data="getlogisticsData.Traces" stripe border width="100%">
+    <el-table-column prop="AcceptTime" width="250px" align="center" label="时间">
     </el-table-column>
-    <el-table-column label="订单行程" prop="AcceptStation" align="center" show-overflow-tooltip>
+    <el-table-column label="订单行程" width="709px" prop="AcceptStation" show-overflow-tooltip align="center">
     </el-table-column>
   </el-table>
   <div v-show="getlogisticsData.Reason">

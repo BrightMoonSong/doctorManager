@@ -41,11 +41,11 @@
     </el-table-column>
     <el-table-column label="商品个数" prop="count" align="center" show-overflow-tooltip>
     </el-table-column>
-    <el-table-column label="总价" align="center" show-overflow-tooltip>
+    <!-- <el-table-column label="总价" align="center" show-overflow-tooltip>
       <template slot-scope="scope">
         <span v-text="scope.row.price*scope.row.count + '元'"></span>
       </template>
-    </el-table-column>
+    </el-table-column> -->
   </el-table>
   <h4>合计金额：{{totalPrice | money('元')}}</h4>
   <div slot="footer" class="dialog-footer">

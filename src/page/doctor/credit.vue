@@ -5,11 +5,11 @@
       <el-button type="success" size="medium" @click="goPurchase()">下单采购</el-button>
     </div>
     <div class="el-col el-col-6" style="margin: 15px;">
-      <el-cascader style="width:100%;" placeholder="检索分类"
+      <el-cascader style="width:100%;" placeholder="检索分类" :maxlength="18"
         :options="selectList" v-model="cateIdList"
         @active-item-change="handleItemChange"
         :props="props"
-        filterable
+        clearable
       ></el-cascader>
     </div>
     <div class="el-col el-col-6" style="margin: 15px;">
@@ -195,6 +195,9 @@ export default {
       this.showImg = false;
     },
     async initData(pageNo, pageSize) {
+      if (this.cateIdList.length === 0) {
+        this.categoryId = '';
+      }
       let res = await findinfoself({
         'pageSize': pageSize,
         'pageNo': pageNo,

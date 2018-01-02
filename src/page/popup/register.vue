@@ -2,15 +2,18 @@
 <el-dialog title="注册" align="center" top="20vh" width="450px" :visible.sync="myregShow">
   <el-form>
     <el-form-item>
-      <el-input v-model="registerForm.phone" placeholder="手机号"></el-input>
+      <el-input v-model="registerForm.recommendPhone" :maxlength="11" placeholder="推荐人手机号（没有的话可不填）"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-input placeholder="验证码" v-model="registerForm.smsCode" class="input-with-select">
+      <el-input v-model="registerForm.phone" :maxlength="11" placeholder="手机号"></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-input placeholder="验证码" v-model="registerForm.smsCode" :maxlength="6" class="input-with-select">
         <el-button slot="append" v-text="sendText" @click="sendsms"></el-button>
       </el-input>
     </el-form-item>
     <el-form-item>
-      <el-input type="password" placeholder="密码" v-model="registerForm.password" @keyup.enter.native="submitForm"></el-input>
+      <el-input type="password" placeholder="密码" :maxlength="12" v-model="registerForm.password" @keyup.enter.native="submitForm"></el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submitForm" class="submit_btn">注册</el-button>
@@ -34,6 +37,7 @@ export default {
       setIntervalThis: '',
       registerForm: {
         'phone': '',
+        'recommendPhone': '',
         'smsCode': '',
         'password': ''
       }
@@ -44,12 +48,22 @@ export default {
       console.log(this.registerForm);
       if (this.registerForm.phone === '' || this.registerForm.smsCode === '' || this.registerForm.password === '') {
         this.$notify.error({
-          title: '信息不完整',
+          title: '手机号、验证码、密码都必填!',
           message: ''
         });
         return;
       }
+      if (this.registerForm.recommendPhone !== '') {
+        if (!(/^1[3|4|5|7|8][0-9]\d{4,8}$/.test(this.registerForm.recommendPhone))) {
+          this.$notify.error({
+            title: '推荐人手机号格式不正确',
+            message: ''
+          });
+          return;
+        }
+      }
       let res = await shiroreg({
+        'recommendPhone': this.registerForm.recommendPhone,
         'phone': this.registerForm.phone,
         'smsCode': this.registerForm.smsCode,
         'password': this.registerForm.password

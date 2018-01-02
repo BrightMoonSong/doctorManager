@@ -1,6 +1,10 @@
 <template lang="html">
 <div class="body-code">
-  <img class="qrcode" v-bind:src="'data:image/jpg;base64,'+base" />
+  <el-tabs type="border-card">
+    <el-tab-pane label="用户管理">
+      <img class="qrcode" v-bind:src="'data:image/jpg;base64,'+base" />
+    </el-tab-pane>
+  </el-tabs>
 </div>
 </template>
 
