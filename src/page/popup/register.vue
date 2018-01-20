@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     async submitForm() {
-      console.log(this.registerForm);
+      // console.log(this.registerForm);
       if (this.registerForm.phone === '' || this.registerForm.smsCode === '' || this.registerForm.password === '') {
         this.$notify.error({
           title: '手机号、验证码、密码都必填!',
@@ -54,7 +54,7 @@ export default {
         return;
       }
       if (this.registerForm.recommendPhone !== '') {
-        if (!(/^1[3|4|5|7|8][0-9]\d{4,8}$/.test(this.registerForm.recommendPhone))) {
+        if (!(/^1[3|4|5|6|7|8|9][0-9]\d{4,8}$/.test(this.registerForm.recommendPhone))) {
           this.$notify.error({
             title: '推荐人手机号格式不正确',
             message: ''
@@ -68,8 +68,8 @@ export default {
         'smsCode': this.registerForm.smsCode,
         'password': this.registerForm.password
       });
-      console.log('注册');
-      console.log(res);
+      // console.log('注册');
+      // console.log(res);
       if (res.code === 1) {
         this.myregShow = false;
       }

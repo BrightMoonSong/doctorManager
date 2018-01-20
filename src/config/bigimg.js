@@ -9,17 +9,20 @@ export default function(el, binding) {
       // 添加 div
       var div = document.createElement('div');
       // 设置 div 属性，如 id
-      div.setAttribute('style', 'position: fixed;top: 0;left: 0;z-index:2002;background: rgba(19,23,27,.7);text-align: center;width:100%;min-height:600;height:100%;overflow: auto;');
+      div.setAttribute('style', 'position: fixed;top: 0;left: 0;z-index:3333;background: rgba(19,23,27,.7);text-align: center;width:100%;min-height:600;height:100%;overflow: auto;');
       div.innerHTML = '<img src="' + binding.value + '" style="margin:0 auto;margin-top:70px;min-height:60%;max-height:100%;" />';
-      div.ondblclick = function() {
+      // div.ondblclick = function() {
+      //   div.parentNode.removeChild(div);
+      // };
+      div.onclick = function() {
         div.parentNode.removeChild(div);
       };
       parent.appendChild(div);
       // console.dir(Vue);
-      window.vm.$notify({
-        type: 'info',
-        message: '双击退出图片放大！'
-      });
+      // window.vm.$notify({
+      //   type: 'info',
+      //   message: '双击退出图片放大！'
+      // });
     }
   };
 }

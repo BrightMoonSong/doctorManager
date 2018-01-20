@@ -8,8 +8,8 @@
       </div>
       <div class="el-col el-col-8" style="padding: 5px;padding-left: 0px;width:220px;">
         <el-date-picker
-          v-model="month"
-          type="month"
+          v-model="month" :editable="false"
+          type="month" :clearable="false"
           placeholder="选择时间">
         </el-date-picker>
       </div>
@@ -17,9 +17,13 @@
         <!-- <el-button type="primary" plain>查询</el-button> -->
         <el-button type="primary" @click="searchList" icon="el-icon-search">搜索</el-button>
       </div>
+      <div class="el-col el-col-4" style="margin: 5px;width: 85px;float:right;">
+        <el-button type="primary" style="float:right;" @click="searchList">刷新</el-button>
+      </div>
       <el-table
         :data="tableData"
         stripe
+        v-loading="loading1"
         border
         style="width: 100%;">
         <el-table-column
@@ -30,8 +34,8 @@
           width="180">
         </el-table-column>
         <el-table-column
-          prop="userName"
-          label="收货人"
+          prop="userPhone"
+          label="患者电话"
           show-overflow-tooltip
           align="center">
         </el-table-column>
@@ -62,6 +66,20 @@
           label="收货时间">
         </el-table-column>
         <el-table-column
+          align="center"
+          show-overflow-tooltip
+          label="结算状态">
+          <template slot-scope="scope">
+            <span v-text="jiesuanStatus[scope.row.status-1]"></span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="settlementTimeStr"
+          align="center"
+          show-overflow-tooltip
+          label="结算时间">
+        </el-table-column>
+        <el-table-column
           fixed="right"
           label="操作"
           align="center"
@@ -75,7 +93,9 @@
         <el-pagination style="display: inline-block;" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[5, 10, 20, 30, 40]" :page-size="currentPageSize" layout="total, sizes, prev, pager, next, jumper" :total="count">
         </el-pagination>
         <span style="float: right;margin-right:30px;">{{totalOrderMoney}}元</span>
-        <span style="float: right;">有效金额：</span>
+        <span style="float: right;">当月有效订单金额：</span>
+        <span v-if="monthContrast==monthContrast2" style="float: right;margin-right:30px;">{{getincomeData}}元</span>
+        <span v-if="monthContrast==monthContrast2" style="float: right;">当月预计收益：</span>
       </div>
       <orderdetail :downifShow="dialogDegShowOrHide" :orderId="orderId" @dialog="onDialogRegChange"></orderdetail>
     </el-tab-pane>
@@ -86,8 +106,8 @@
       </div>
       <div class="el-col el-col-8" style="padding: 5px;padding-left: 0px;width:220px;">
         <el-date-picker
-          v-model="yearMonth2"
-          type="month"
+          v-model="yearMonth2" :editable="false"
+          type="month" :clearable="false"
           placeholder="选择时间">
         </el-date-picker>
       </div>
@@ -95,9 +115,13 @@
         <!-- <el-button type="primary" plain>查询</el-button> -->
         <el-button type="primary" @click="searchList2" icon="el-icon-search">搜索</el-button>
       </div>
+      <div class="el-col el-col-4" style="margin: 5px;width: 85px;float:right;">
+        <el-button type="primary" style="float:right;" @click="searchList2">刷新</el-button>
+      </div>
       <el-table
         :data="tableData2"
         stripe
+        v-loading="loading2"
         border
         style="width: 100%;">
         <el-table-column
@@ -144,9 +168,9 @@
         <el-pagination style="display: inline-block;" @size-change="handleSizeChange2" @current-change="handleCurrentChange2" :current-page="currentPage2" :page-sizes="[5, 10, 20, 30, 40]" :page-size="currentPageSize2" layout="total, sizes, prev, pager, next, jumper" :total="count2">
         </el-pagination>
         <span style="float: right;margin-right:30px;">{{count2}}人</span>
-        <span style="float: right;">本月推广人数：</span>
+        <span style="float: right;">当月推广人数：</span>
         <span style="float: right;margin-right:30px;">{{totalOrderMoney2}}元</span>
-        <span style="float: right;">本月推广收益：</span>
+        <span style="float: right;">当月推广收益：</span>
       </div>
     </el-tab-pane>
     <el-tab-pane>
@@ -156,8 +180,8 @@
       </div>
       <div class="el-col el-col-8" style="padding: 5px;padding-left: 0px;width:220px;">
         <el-date-picker
-          v-model="yearMonth3"
-          type="month"
+          v-model="yearMonth3" :editable="false"
+          type="month" :clearable="false"
           placeholder="选择时间">
         </el-date-picker>
       </div>
@@ -165,9 +189,13 @@
         <!-- <el-button type="primary" plain>查询</el-button> -->
         <el-button type="primary" @click="searchList3" icon="el-icon-search">搜索</el-button>
       </div>
+      <div class="el-col el-col-4" style="margin: 5px;width: 85px;float:right;">
+        <el-button type="primary" style="float:right;" @click="searchList3">刷新</el-button>
+      </div>
       <el-table
         :data="tableData3"
         stripe
+        v-loading="loading3"
         border
         style="width: 100%;">
         <el-table-column
@@ -184,13 +212,13 @@
           align="center">
         </el-table-column>
         <el-table-column
-          prop="orderMoney"
+          prop="settlementMoney"
           align="center"
           show-overflow-tooltip
           label="订单金额">
         </el-table-column>
         <el-table-column
-          prop="incomeProp"
+          prop="prop"
           align="center"
           show-overflow-tooltip
           label="收益比例">
@@ -201,14 +229,28 @@
           show-overflow-tooltip
           label="收益">
         </el-table-column>
+        <el-table-column
+          align="center"
+          show-overflow-tooltip
+          label="结算状态">
+          <template slot-scope="scope">
+            <span v-text="jiesuanStatus[scope.row.status-1]"></span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="settlementTimeStr"
+          align="center"
+          show-overflow-tooltip
+          label="结算时间">
+        </el-table-column>
       </el-table>
       <div class="Pagination" style="text-align: left;margin-top: 10px;">
         <el-pagination style="display: inline-block;" @size-change="handleSizeChange3" @current-change="handleCurrentChange3" :current-page="currentPage3" :page-sizes="[5, 10, 20, 30, 40]" :page-size="currentPageSize3" layout="total, sizes, prev, pager, next, jumper" :total="count3">
         </el-pagination>
         <span style="float: right;margin-right:30px;">{{totalIncome3}}元</span>
-        <span style="float: right;">本月推广订单收益：</span>
+        <span style="float: right;">当月推广订单收益：</span>
         <span style="float: right;margin-right:30px;">{{totalOrderMoney3}}元</span>
-        <span style="float: right;">本月推广订单总金额：</span>
+        <span style="float: right;">当月推广订单总金额：</span>
       </div>
     </el-tab-pane>
   </el-tabs>
@@ -220,6 +262,7 @@
 import {
   doctorprofitinfos,
   recommendorders,
+  getincome,
   recommendinfos
 } from '@/api/getData';
 import orderdetail from '@/page/popup/orderDetail';
@@ -227,6 +270,9 @@ import orderdetail from '@/page/popup/orderDetail';
 export default {
   data() {
     return {
+      loading1: true,
+      loading2: true,
+      loading3: true,
       parmValue: '',
       parmValue2: '',
       parmValue3: '',
@@ -251,7 +297,10 @@ export default {
       totalOrderMoney3: 0,
       totalIncome3: '',
       month: '',
+      monthContrast: '',
+      monthContrast2: '',
       yearMonth2: '',
+      getincomeData: '',
       yearMonth3: ''
     };
   },
@@ -261,6 +310,7 @@ export default {
   mounted() {
     let date = new Date();
     this.month = date;
+    this.monthContrast = this.dateFtt('yyyy', date) + '-' + this.dateFtt('MM', date);
     this.yearMonth2 = date;
     this.yearMonth3 = date;
     this.initData(this.currentPage, this.currentPageSize);
@@ -277,6 +327,7 @@ export default {
     },
     searchList() {
       this.initData(this.currentPage, this.currentPageSize);
+      this.getincome();
     },
     searchList2() {
       this.initData2(this.currentPage2, this.currentPageSize2);
@@ -284,21 +335,35 @@ export default {
     searchList3() {
       this.initData3(this.currentPage3, this.currentPageSize3);
     },
+    async getincome() {
+      let res = await getincome();
+      if (res.code === 0) {
+        this.getincomeData = res.data;
+      }
+    },
     async initData(pageNo, pageSize) {
-      let res = await doctorprofitinfos({
+      this.loading1 = true;
+      let obj = {
         'parmValue': this.parmValue,
         'year': this.month ? this.dateFtt('yyyy', this.month) : '',
         'month': this.month ? this.dateFtt('MM', this.month) : '',
         'pageSize': pageSize,
         'pageNo': pageNo
-      });
+      };
+      let res = await doctorprofitinfos(obj);
+      this.monthContrast2 = obj.year + '-' + obj.month;
       if (res.code === 0) {
         this.tableData = res.data.orders;
-        this.totalOrderMoney = res.data.totalOrderMoney;
+        this.totalOrderMoney = res.data.totalOrderMoney ? res.data.totalOrderMoney : 0;
         this.count = res.totalSize;
       }
+      if (this.monthContrast2 === this.monthContrast) {
+        this.getincome();
+      }
+      this.loading1 = false;
     },
     async initData2(pageNo, pageSize) {
+      this.loading2 = true;
       let res = await recommendinfos({
         'parmValue': this.parmValue2,
         'year': this.yearMonth2 ? this.dateFtt('yyyy', this.yearMonth2) : '',
@@ -308,11 +373,13 @@ export default {
       });
       if (res.code === 0) {
         this.tableData2 = res.data.list;
-        this.totalOrderMoney2 = res.data.money;
+        this.totalOrderMoney2 = res.data.money ? res.data.money : 0;
         this.count2 = res.totalSize;
       }
+      this.loading2 = false;
     },
     async initData3(pageNo, pageSize) {
+      this.loading3 = true;
       let res = await recommendorders({
         'parmValue': this.parmValue3,
         'year': this.yearMonth3 ? this.dateFtt('yyyy', this.yearMonth3) : '',
@@ -322,10 +389,11 @@ export default {
       });
       if (res.code === 0) {
         this.tableData3 = res.data.orders;
-        this.totalOrderMoney3 = res.data.totalOrderMoney;
-        this.totalIncome3 = res.data.totalIncome;
+        this.totalOrderMoney3 = res.data.totalOrderMoney ? res.data.totalOrderMoney : 0;
+        this.totalIncome3 = res.data.totalIncome ? res.data.totalIncome : 0;
         this.count3 = res.totalSize;
       }
+      this.loading3 = false;
     },
     dateFtt(fmt, date) {
       // this.datePicker[0] ? this.dateFtt('yyyy-MM-dd hh:mm:ss', this.datePicker[0]) : '',
@@ -371,7 +439,7 @@ export default {
     handleSizeChange3(val) {
       this.currentPageSize3 = val;
       this.currentPage3 = 1;
-      this.initData2(this.currentPage3, this.currentPageSize3);
+      this.initData3(this.currentPage3, this.currentPageSize3);
     },
     handleCurrentChange3(val) {
       this.initData3(val, this.currentPageSize3);

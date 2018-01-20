@@ -25,7 +25,7 @@
 <script>
 import {
   send,
-  changepwd
+  shiroforgetpwd
 } from '@/api/getData';
 
 export default {
@@ -84,7 +84,6 @@ export default {
     async submitForm(formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          console.log(this.forgetForm);
           if (this.forgetForm.phone === '' || this.forgetForm.smsCode === '') {
             this.$notify.error({
               title: '手机号验证码不能为空',
@@ -92,15 +91,15 @@ export default {
             });
             return;
           }
-          let res = await changepwd({
-            'phone': '',
-            'smsCode': '',
-            'password': ''
+          let res = await shiroforgetpwd({
+            'phone': this.forgetForm.phone,
+            'smsCode': this.forgetForm.smsCode,
+            'password': this.forgetForm.password2
           });
-          console.log('忘记密码');
-          console.log(res);
+          if (res.code === 1) {
+            this.forgetpShowThis = false;
+          }
         } else {
-          console.log('error submit!!');
           return false;
         }
       });
@@ -108,7 +107,7 @@ export default {
     async sendsms() {
       if (this.sendText === '重新发送' || this.sendText === '发送验证码') {
         if (this.forgetForm.phone !== '') {
-          if (!(/^1[3|4|5|7|8][0-9]\d{4,8}$/.test(this.forgetForm.phone))) {
+          if (!(/^1[3|4|5|6|7|8|9][0-9]\d{4,8}$/.test(this.forgetForm.phone))) {
             this.$notify.error({
               title: '手机号格式不正确',
               message: ''
@@ -141,9 +140,22 @@ export default {
       }
     }
   },
+  beforeDestroy() {
+    clearInterval(this.setIntervalThis);
+  },
   watch: {
     forgetpShow: function(val, oldVal) { // 2
       this.forgetpShowThis = val;
+      if (val) {
+        this.sendText = '发送验证码';
+        this.setIntervalThis = '';
+        this.forgetForm.phone = '';
+        this.forgetForm.smsCode = '';
+        this.forgetForm.password = '';
+        this.forgetForm.password2 = '';
+      } else {
+        clearInterval(this.setIntervalThis);
+      }
     },
     forgetpShowThis(val) { // 3
       this.$emit('myevent', val);

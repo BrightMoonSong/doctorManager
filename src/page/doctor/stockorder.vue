@@ -29,8 +29,12 @@
     <el-button type="primary" @click="searchList" icon="el-icon-search">搜索</el-button>
     <el-button type="success" style="margin-left:0;" @click="pageJump">下单采购</el-button>
   </div>
+  <div class="el-col el-col-4" style="margin: 5px;width: 85px;float:right;">
+    <el-button type="primary" style="float:right;" @click="searchList">刷新</el-button>
+  </div>
   <el-table
     :data="tableData"
+    v-loading="loading"
     stripe
     border
     style="width: 100%;">
@@ -119,6 +123,7 @@ export default {
       orderLogId: 0,
       parmValue: '',
       count: 0,
+      loading: true,
       currentPage: 1,
       currentPageSize: 10,
       tableData: [],
@@ -181,7 +186,7 @@ export default {
   methods: {
     async downOrderNext(orderId) {
       let res = await cancel(orderId);
-      console.log(res);
+      // console.log(res);
       this.currentPage = 1;
       this.currentPageSize = 10;
       if (res.code === 1) {
@@ -230,7 +235,7 @@ export default {
     },
     async receiveFunConfim(orderId) {
       let res = await receive(orderId);
-      console.log(res);
+      // console.log(res);
       this.currentPage = 1;
       this.currentPageSize = 10;
       if (res.code === 1) {
@@ -283,6 +288,7 @@ export default {
       return fmt;
     },
     async initData(pageNo, pageSize) {
+      this.loading = true;
       let status = this.orderStatus;
       if (status === '') {
         status = 5;
@@ -313,6 +319,7 @@ export default {
         this.tableData = res.data;
         this.count = res.totalSize;
       }
+      this.loading = false;
     },
     handleSizeChange(val) {
       this.currentPageSize = val;

@@ -206,7 +206,7 @@ export default {
     },
     async handleClick(row, index) {
       let res = await getinfoforgoods(row.goodsId);
-      console.log(res);
+      // console.log(res);
       if (res.code === 0) {
         this.selectTable = res.data;
         this.dialogShowOrHide = true;

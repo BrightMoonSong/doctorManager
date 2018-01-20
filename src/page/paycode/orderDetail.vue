@@ -18,7 +18,7 @@
   <div class="topline"></div>
   <el-form ref="form" label-width="100px" size="mini">
     <el-form-item label="姓名：">
-      <span v-text="dataList.userName" style="width: 75%;"></span>
+      <span v-text="dataList.orderAddressVo.receiveName" style="width: 75%;"></span>
     </el-form-item>
     <el-form-item label="年龄：">
       <span v-text="dataList.userAge" style="width: 75%;"></span>
@@ -28,7 +28,7 @@
       <el-radio v-model="dataList.userGender" :disabled="true" :label="2">女</el-radio>
     </el-form-item>
     <el-form-item label="手机号：">
-      <span v-text="dataList.userPhone" style="width: 75%;"></span>
+      <span v-text="dataList.orderAddressVo.receivePhone" style="width: 75%;"></span>
     </el-form-item>
     <el-form-item label="详细地址：">
       <span v-text="dataList.orderAddressVo.detailAddress" style="width: 75%;"></span>

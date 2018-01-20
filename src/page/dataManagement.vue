@@ -9,12 +9,12 @@
             <ul>
               <li>
                 <span style="text-align: right;">姓名：</span>
-                <el-input style="width:50%;" v-model="dataInfo.doctorName" :maxlength="15" :disabled="editStart" placeholder="请输入姓名"></el-input>
+                <el-input style="width:40%;" v-model="dataInfo.doctorName" :maxlength="15" :disabled="editStart" placeholder="请输入姓名"></el-input>
               </li>
               <li>
                 <span style="text-align: right;">类型：</span>
                 <!-- <el-input style="width:50%;" v-model="dataInfo.type" :disabled="editStart" placeholder="请输入类型"></el-input> -->
-                <el-select style="width:50%;" v-model="dataInfo.type" :disabled="editStart" placeholder="请选择类型">
+                <el-select style="width:40%;" v-model="dataInfo.type" :disabled="editStart" placeholder="请选择类型">
                   <el-option v-for="item in typeList" :key="item.typeId" :label="item.typeName" :value="item.typeId">
                   </el-option>
                 </el-select>
@@ -67,27 +67,27 @@
             <ul>
               <li class="el-col el-col-12" style="text-align: center;">
                 <span>医疗机构执业许可证：</span>
-                <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg1" :before-upload="beforeImgUpload">
+                <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg1" :before-upload="beforeImgUpload2">
                   <img v-if="imgUrl1" :src="imgUrl1" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
-                <span>证件截止有效期：</span>
+                <!-- <span>证件截止有效期：</span>
                 <div class="block">
                   <el-date-picker :disabled="editStart" style="width: 170px;" v-model="validityDate1" type="date" placeholder="证件截止有效期">
                   </el-date-picker>
-                </div>
+                </div> -->
               </li>
               <li class="el-col el-col-12" style="text-align: center;">
                 <span>医师证：</span>
-                <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg2" :before-upload="beforeImgUpload">
+                <el-upload :disabled="editStart" class="avatar-uploader" action="https://zhydl.oss-cn-beijing.aliyuncs.com" :show-file-list="false" :data="dataObject" name="file" :on-success="uploadImg2" :before-upload="beforeImgUpload2">
                   <img v-if="imgUrl2" :src="imgUrl2" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
-                <span>证件截止有效期：</span>
+                <!-- <span>证件截止有效期：</span>
                 <div class="block">
                   <el-date-picker :disabled="editStart" style="width: 170px;" v-model="validityDate2" type="date" placeholder="证件截止有效期">
                   </el-date-picker>
-                </div>
+                </div> -->
               </li>
               <!-- <li class="el-col el-col-8">
                 <span>健康证：</span>
@@ -108,7 +108,7 @@
       </div>
     </div>
     <el-row :gutter="20" style="margin-top: 10px;margin-bottom: 10px;">
-      <el-col :span="4" :offset="9" style="min-width:350px;">
+      <el-col :span="4" :offset="9" style="min-width:387px;text-align:center;">
         <el-button type="primary" v-show="editStart" @click="editStates(1)" plain>修改信息</el-button>
         <el-button type="primary" v-show="!editStart" @click="editStates(2)" plain>提交</el-button>
         <el-button type="primary" v-show="!editStart" @click="editStates(3)" plain>取消</el-button>
@@ -166,7 +166,9 @@ import {
 } from '@/config/env';
 import {
   getStore,
-  clone
+  clone,
+  setOssPathHeader,
+  setOssPathCertificates
 } from '@/config/mUtils';
 import {
   findareabypid,
@@ -397,7 +399,7 @@ export default {
       if (file.status === 'success') {
         this.$message.success('上传图片成功！');
         this.headerImg = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
-        console.info(this.headerImg);
+        // console.info(this.headerImg);
         let respon = await updateheadimg({
           'headImg': this.headerImg
         });
@@ -419,7 +421,7 @@ export default {
     uploadImg2(res, file) { // up, file, info   /res, file
       if (file.status === 'success') {
         this.$message.success('上传图片成功！');
-        console.info('https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName);
+        // console.info('https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName);
         this.imgUrl2 = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
       } else {
         this.$message.error('上传图片失败！');
@@ -428,7 +430,7 @@ export default {
     uploadImg3(res, file) { // up, file, info   /res, file
       if (file.status === 'success') {
         this.$message.success('上传图片成功！');
-        console.info('https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName);
+        // console.info('https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName);
         this.imgUrl3 = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
       } else {
         this.$message.error('上传图片失败！');
@@ -464,7 +466,43 @@ export default {
           var r = Math.floor(Math.random() * 10);
           rand += r;
         }
-        this.dataFileName = 'dev/doctor/' + yearSec + rand + '.jpg';
+        this.dataFileName = setOssPathHeader + yearSec + rand + '.jpg';
+        this.dataObject.key = this.dataFileName;
+      } else {
+        return false;
+      }
+    },
+    async beforeImgUpload2(file) {
+      // "jpg,gif,png,bmp"
+      const isJPG = file.type === 'image/jpeg';
+      const isPNG = file.type === 'image/png';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (isJPG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.jpg';
+      }
+      if (isPNG) {
+        let arr = this.dataFileName.split('.');
+        this.dataFileName = arr[0] + '.png';
+      }
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传证件图片只能是 JPG或者PNG 格式!');
+        return false;
+      }
+      if (!isLt2M) {
+        this.$message.error('上传证件图片大小不能超过 2MB!');
+        return false;
+      }
+      let res = await this.initGetSign();
+      if (res) {
+        var oDate = new Date(); // 实例一个时间对象；
+        var yearSec = '' + oDate.getFullYear() + (oDate.getMonth() + 1) + oDate.getDate() + oDate.getHours() + oDate.getMinutes() + oDate.getSeconds();
+        var rand = '';
+        for (let i = 0; i < 3; i++) {
+          var r = Math.floor(Math.random() * 10);
+          rand += r;
+        }
+        this.dataFileName = setOssPathCertificates + yearSec + rand + '.jpg';
         this.dataObject.key = this.dataFileName;
       } else {
         return false;
@@ -489,7 +527,7 @@ export default {
         case 2:
           this.dataInfoShow1 = false;
           this.dataInfoShow = false;
-          this.$message.success('个人信息审核已通过!');
+          // this.$message.success('个人信息审核已通过!');
           this.navshow.isshow = true;
           break;
         case 3:
@@ -499,7 +537,7 @@ export default {
         case 4:
           this.dataInfoShow1 = false;
           this.editStates(1);
-          // this.$message.error('已注册未提交审核!');
+          this.$message.warning('当前账户尚未提交认证信息，请尽快提交认证!');
           break;
       }
       let obj = res.data;
@@ -585,6 +623,14 @@ export default {
             this.$message.error('医师证必须上传！');
             return false;
           }
+          // if (!this.validityDate1) {
+          //   this.$message.error('医疗机构执业许可证的“证件截止有效期”为必填项！');
+          //   return false;
+          // }
+          // if (!this.validityDate2) {
+          //   this.$message.error('医师证的“证件截止有效期”为必填项！');
+          //   return false;
+          // }
           this.dataInfo.cardList = [{
               'cardType': 1,
               'imgUrl': this.imgUrl1,
@@ -602,7 +648,7 @@ export default {
             this.$message.error('手机号是必填项！');
             return false;
           }
-          if (!(/^1[34578]\d{9}$/.test(this.dataInfo.phone))) {
+          if (!(/^1[0-9]\d{9}$/.test(this.dataInfo.phone))) {
             this.$message.error('手机号格式不正确！');
             return false;
           }
@@ -648,8 +694,24 @@ export default {
       switch (n) {
         case 1:
           this.editStart1 = false;
+          // -2数据校验异常，401登录失效，403权限不足，-101账户不存在，-202每月结算日期内不能修改银行卡信息
           let resp = await deletebankcard(this.bankList.id);
-          console.log(resp);
+          switch (resp.code) {
+            case -2:
+              this.$message({
+                type: 'error',
+                message: '数据校验异常'
+              });
+              break;
+            case -202:
+              this.$message({
+                type: 'error',
+                message: '每月结算日期内不能修改银行卡信息'
+              });
+              break;
+            default:
+
+          }
           // this.initEnty(); // 重新初始化
           this.bankLengthShow = true; // 重新填银行卡信息
           this.bankList = {
@@ -660,7 +722,7 @@ export default {
             'cardNo': ''
           };
           break;
-        case 2:
+        case 2: // 提交
           // var dataObj = clone(this.bankList);
           let dataObj = {
             'doctorId': this.bankList.doctorId,
@@ -669,6 +731,34 @@ export default {
             'registrationBank': this.bankList.registrationBank,
             'cardNo': this.bankList.cardNo
           };
+          if (!dataObj.cardNo) {
+            this.$message({
+              type: 'error',
+              message: '银行账号不可为空！'
+            });
+            return;
+          }
+          if (!dataObj.bank) {
+            this.$message({
+              type: 'error',
+              message: '开户银行为必填项！'
+            });
+            return;
+          }
+          if (!dataObj.registrationAddress) {
+            this.$message({
+              type: 'error',
+              message: '开户地址不可为空！'
+            });
+            return;
+          }
+          if (!dataObj.registrationBank) {
+            this.$message({
+              type: 'error',
+              message: '支行名称不可为空！'
+            });
+            return;
+          }
           let res = await addbankcard(dataObj);
           if (res.code === 1) {
             this.editStart1 = true;
@@ -705,21 +795,21 @@ export default {
             this.bankList.bank = res.data;
           }
         }
-        console.log('根据银行卡号获取银行名称');
-        console.log(res);
       }
     },
     async provincialCity() {
       let res = await findareabypid(0);
       this.selectList = [];
-      res.data.forEach(val => {
-        let obj = {
-          value: val.areaId,
-          label: val.name,
-          children: []
-        };
-        this.selectList.push(obj);
-      });
+      if (res.data) {
+        res.data.forEach(val => {
+          let obj = {
+            value: val.areaId,
+            label: val.name,
+            children: []
+          };
+          this.selectList.push(obj);
+        });
+      }
     },
     createFilter(queryString) {
       return (restaurant) => {

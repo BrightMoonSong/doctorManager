@@ -14,7 +14,11 @@
           <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
         </el-input>
       </div>
+      <div class="el-col el-col-4" style="margin: 15px;width: 85px;float:right;">
+        <el-button type="primary" style="float:right;" @click="search">刷新</el-button>
+      </div>
       <el-table :data="tableData" stripe border style="width: 100%;" ref="multipleTable"
+        v-loading="loading"
         @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column
@@ -209,6 +213,7 @@ export default {
       input5: '',
       smsCode: '',
       dialogShowOrHide: false,
+      loading: true,
       dialogDegShowOrHide: false,
       count: 0,
       currentPage: 1,
@@ -242,7 +247,7 @@ export default {
   mounted() {
     // 获取三级分类
     this.findinfosbypid();
-    this.initData(1, 10);
+    this.initData(this.currentPage, this.currentPageSize);
     this.doctorInfo();
   },
   methods: {
@@ -283,7 +288,7 @@ export default {
       if (this.cateIdList.length === 3) {
         this.categoryId = this.cateIdList[2];
       }
-      this.initData(1, 10);
+      this.initData(this.currentPage, this.currentPageSize);
     },
     async handleItemChange(val) {
       if (val.length === 3) {
@@ -342,6 +347,7 @@ export default {
       });
     },
     async initData(pageNo, pageSize) {
+      this.loading = true;
       if (this.cateIdList.length === 0) {
         this.categoryId = '';
       }
@@ -358,6 +364,7 @@ export default {
       }
       this.tableData = res.data;
       this.count = res.totalSize;
+      this.loading = false;
     },
     async downOrderNext() {
       let obj = {
@@ -387,7 +394,7 @@ export default {
           return false;
         }
         if (this.receiveObj.receiveAddress && this.receiveObj.receiveName && this.receiveObj.receivePhone) {
-          if (!(/^1[34578]\d{9}$/.test(this.receiveObj.receivePhone))) {
+          if (!(/^1[0-9]\d{9}$/.test(this.receiveObj.receivePhone))) {
             this.$message.error('手机号格式不正确！');
             return false;
           }
@@ -442,7 +449,7 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(val);
+      // console.log(val);
     },
     toggleSelection(or) {
       if (or) {

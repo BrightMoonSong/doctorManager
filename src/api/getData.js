@@ -222,7 +222,13 @@ export const ordercancel = data => http('/dapi/orders/cancel?orderId=' + data, {
  * 模拟微信扫码支付获取二维码链接接口
  */
 
-export const getpaycode = data => http('/dapi/orders/getpaycode?orderId=' + data);
+export const getpaycode = data => http('/dapi/wxpay/getpaycode?orderId=' + data);
+
+/**
+ * 模拟微信扫码支付获取二维码链接接口-----假的
+ */
+
+export const getpaycode2 = data => http('/dapi/orders/getpaycode?orderId=' + data);
 
 /**
  * 模拟微信扫码支付心跳接口
@@ -250,3 +256,10 @@ export const recommendinfos = data => http('/dapi/doctorprofit/recommendinfos?pa
  */
 
 export const recommendorders = data => http('/dapi/doctorprofit/recommendorders?parmValue=' + data.parmValue + '&year=' + data.year + '&month=' + data.month + '&pageSize=' + data.pageSize + '&pageNo=' + data.pageNo + '&type=' + data.type);
+
+/**
+ * 医生收益管理
+ * 获取本月1日到目前为止预计收益
+ */
+
+export const getincome = () => http('/dapi/doctorprofit/getincome');

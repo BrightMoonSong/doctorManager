@@ -17,7 +17,11 @@
         <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
       </el-input>
     </div>
+    <div class="el-col el-col-4" style="margin: 15px;width: 85px;float:right;">
+      <el-button type="primary" style="float:right;" @click="search">刷新</el-button>
+    </div>
     <el-table :data="tableData"
+      v-loading="loading"
       stripe border style="width: 100%;">
       <el-table-column
         prop="src" label="商品图片"
@@ -37,6 +41,14 @@
         align="center"
         show-overflow-tooltip
         label="商品简介">
+      </el-table-column>
+      <el-table-column
+        show-overflow-tooltip
+        label="商品类型"
+        align="center">
+        <template slot-scope="scope">
+          <span>{{goodsTypeList[scope.row.goodsType-1]}}</span>
+        </template>
       </el-table-column>
       <el-table-column
         prop="salesPrice"
@@ -90,8 +102,10 @@ export default {
     return {
       dialogShowOrHide: false,
       selectTable: [],
+      goodsTypeList: ['处方药', '非处方药', '其他'],
       select: '',
       showImg: false,
+      loading: true,
       totalCredit: '',
       bigImgSrc: '',
       tableData: [],
@@ -195,6 +209,7 @@ export default {
       this.showImg = false;
     },
     async initData(pageNo, pageSize) {
+      this.loading = true;
       if (this.cateIdList.length === 0) {
         this.categoryId = '';
       }
@@ -205,7 +220,7 @@ export default {
         'categoryId': this.categoryId
       });
       this.tableData = res.data;
-      this.count = res.totalSize;
+      this.loading = false;
     },
     handleSizeChange(val) {
       this.currentPageSize = val;
@@ -219,7 +234,6 @@ export default {
     },
     async handleClick(row, index) {
       let res = await getinfoself(row.goodsId);
-      console.log(res);
       if (res.code === 0) {
         this.selectTable = res.data;
         this.dialogShowOrHide = true;

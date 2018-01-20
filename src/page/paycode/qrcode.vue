@@ -67,7 +67,6 @@ export default {
         this.$router.push('manage');
       }
       let res = await getpaystatus(this.orderId);
-      console.log(res);
       if (res) {
         this.$router.push('myOrder');
       }

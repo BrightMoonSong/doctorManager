@@ -104,10 +104,10 @@ export default {
             setStore('userId', res.data.doctorId);
             this.$router.push('manage');
           } else {
-            if (res.code === -102) {} else {
+            if (res.code === -102 || res.code === -101) {} else {
               this.$message({
                 type: 'error',
-                message: '出错了'
+                message: '服务器忙，请稍后重试'
               });
             }
           }

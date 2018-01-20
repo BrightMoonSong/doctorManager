@@ -60,6 +60,7 @@
 
 <script>
 import headTop from '../common/headTop';
+import img from '@/assets/4.jpg';
 import {
   // userfunctions,
   getinfo
@@ -90,10 +91,10 @@ export default {
   },
   methods: {
     handleOpen(key, keyPath) {
-      console.log(key, keyPath);
+      // console.log(key, keyPath);
     },
     handleClose(key, keyPath) {
-      console.log(key, keyPath);
+      // console.log(key, keyPath);
     },
     async userfunctions() {
       // let res = await userfunctions();
@@ -105,6 +106,8 @@ export default {
         if (res.data) {
           if (res.data.headImg) {
             this.adminInfo.avatar = res.data.headImg;
+          } else {
+            this.adminInfo.avatar = img;
           }
           if (res.data.status !== 2) {
             this.navshow.isshow = false;

@@ -29,9 +29,13 @@
     <el-button type="primary" @click="searchList" icon="el-icon-search">搜索</el-button>
     <el-button type="success" style="margin-left:0;" @click="pageJump">下单</el-button>
   </div>
+  <div class="el-col el-col-4" style="margin: 5px;width: 85px;float:right;">
+    <el-button type="primary" style="float:right;" @click="searchList">刷新</el-button>
+  </div>
   <el-table
     :data="tableData"
     stripe
+    v-loading="loading"
     border
     style="width: 100%;">
     <el-table-column
@@ -103,6 +107,7 @@ export default {
   data() {
     return {
       orderId: 0,
+      loading: true,
       parmValue: '',
       count: 0,
       dialogqrshow: false,
@@ -167,7 +172,7 @@ export default {
   methods: {
     async downOrderNext(orderId) {
       let res = await ordercancel(orderId);
-      console.log(res);
+      // console.log(res);
       this.currentPage = 1;
       this.currentPageSize = 10;
       if (res.code === 1) {
@@ -230,7 +235,7 @@ export default {
     ordersdetailbyid(row) {
       this.dialogDegShowOrHide = true;
       this.orderId = row.orderId;
-      console.log(this.orderId);
+      // console.log(this.orderId);
     },
     searchList() {
       this.initData(this.currentPage, this.currentPageSize);
@@ -256,6 +261,7 @@ export default {
       return fmt;
     },
     async initData(pageNo, pageSize) {
+      this.loading = true;
       let res;
       if (this.datePicker instanceof Array) {
         res = await ordersfindinfos({
@@ -282,6 +288,7 @@ export default {
         this.tableData = res.data;
         this.count = res.totalSize;
       }
+      this.loading = false;
     },
     handleSizeChange(val) {
       this.currentPageSize = val;

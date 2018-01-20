@@ -1,5 +1,15 @@
 /* eslint-disable */
 /**
+ * 存储OSS位置--//dev:开发环境 、test:测试环境 、pro:生产环境 、pre:预生产环境
+ */
+// 头像
+ export const setOssPathHeader = 'dev/doctor/header/'
+// 证件
+ export const setOssPathCertificates = 'dev/doctor/certificates/'
+// 处方单
+ export const setOssPathPrescription = 'dev/doctor/prescription/'
+
+/**
  * 存储localStorage
  */
 export const setStore = (name, content) => {

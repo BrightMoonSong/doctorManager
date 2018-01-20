@@ -15,7 +15,7 @@
         <el-radio v-model="sizeForm.sex" :label="1">男</el-radio>
         <el-radio v-model="sizeForm.sex" :label="2">女</el-radio>
       </el-form-item>
-      <el-form-item label="详细地址">
+      <el-form-item label="收货地址">
         <el-input v-model="sizeForm.address" :maxlength="30" style="width: 75%;"></el-input>
       </el-form-item>
       <el-form-item label="症状">
@@ -65,7 +65,11 @@
           <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
         </el-input>
       </div>
+      <div class="el-col el-col-4" style="margin: 15px;width: 85px;float:right;">
+        <el-button type="primary" style="float:right;" @click="search">刷新</el-button>
+      </div>
       <el-table :data="tableData" stripe border style="width: 100%;" ref="multipleTable"
+        v-loading="loading"
         @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column
@@ -247,7 +251,8 @@ import {
   getsign
 } from '@/api/getData';
 import {
-  removeForIndex
+  removeForIndex,
+  setOssPathPrescription
 } from '@/config/mUtils';
 import {
   baseUrl,
@@ -272,6 +277,7 @@ export default {
       dialogShowOrHide: false,
       dialogDegShowOrHide: false,
       count: 0,
+      loading: false,
       showImg: false,
       currentPage: 1,
       currentPageSize: 10,
@@ -318,7 +324,7 @@ export default {
       if (!this.sizeForm.phone) {
         this.$message.error('请先填写手机号！');
       } else {
-        if (!(/^1[34578]\d{9}$/.test(this.sizeForm.phone))) {
+        if (!(/^1[0-9]\d{9}$/.test(this.sizeForm.phone))) {
           this.$message.error('手机号格式不正确！');
           return false;
         }
@@ -416,7 +422,7 @@ export default {
         var r = Math.floor(Math.random() * 10);
         rand += r;
       }
-      this.dataFileName = 'dev/doctor/' + yearSec + rand + '.jpg';
+      this.dataFileName = setOssPathPrescription + yearSec + rand + '.jpg';
       this.dataObject = { // 多个参数
         'key': this.dataFileName,
         'policy': res.data.policy,
@@ -427,6 +433,7 @@ export default {
       return true;
     },
     async initData(pageNo, pageSize) {
+      this.loading = true;
       if (this.cateIdList.length === 0) {
         this.categoryId = '';
       }
@@ -443,11 +450,12 @@ export default {
       }
       this.tableData = res.data;
       this.count = res.totalSize;
+      this.loading = false;
     },
     uploadImg(res, file) { // up, file, info   /res, file
       if (file.status === 'success') {
         this.imageUrl = 'https://zhydl.oss-cn-beijing.aliyuncs.com/' + this.dataFileName;
-        console.info(this.imageUrl);
+        // console.info(this.imageUrl);
       } else {
         this.$message.error('上传图片失败！');
       }
@@ -501,7 +509,7 @@ export default {
     },
     async onSubmit(boolean) {
       if (boolean) {
-        console.log('确认下单');
+        // console.log('确认下单');
         if (!this.sizeForm.phone) {
           this.$message.error('手机号是必填项！');
           return false;
@@ -510,7 +518,7 @@ export default {
           this.$message.error('症状是必填项！');
           return false;
         }
-        if (!(/^1[34578]\d{9}$/.test(this.sizeForm.phone))) {
+        if (!(/^1[0-9]\d{9}$/.test(this.sizeForm.phone))) {
           this.$message.error('手机号格式不正确！');
           return false;
         }
@@ -563,7 +571,7 @@ export default {
     },
     async handleClick(row, index) {
       let res = await getinfoself(row.goodsId);
-      console.log(res);
+      // console.log(res);
       if (res.code === 0) {
         this.selectTable = res.data;
         this.dialogShowOrHide = true;
@@ -581,7 +589,7 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(val);
+      // console.log(val);
     },
     toggleSelection(or) {
       if (or) {

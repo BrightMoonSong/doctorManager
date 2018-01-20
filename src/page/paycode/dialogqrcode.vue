@@ -22,7 +22,8 @@
         <div style="clear:both;"></div>
       </div>
       <div class="payCode">
-        <img class="qrcode" v-lodimg="'data:image/jpg;base64,'+base" />
+        <img class="qrcode" v-if="base" v-lodimg="'data:image/jpg;base64,'+base" />
+        <img class="qrcode" style="width:70px;padding:40px" v-if="!base" v-lodimg="loding" />
         <br />
         <img src="./info.png" class="info" alt="">
       </div>
@@ -31,6 +32,7 @@
 </template>
 
 <script>
+import loding from '@/page/paycode/loadding.gif';
 import {
   getpaycode,
   ordersdetailbyid,
@@ -41,6 +43,7 @@ export default {
   props: ['orderId', 'showqr'],
   data() {
     return {
+      loding: loding,
       base: '',
       orderNo: '',
       orderMoney: 0,
@@ -74,10 +77,16 @@ export default {
       if (this.orderId === '' || this.orderId === null) {
         this.myshowqr = false;
       }
-      let res = await getpaycode(this.orderId).then((val) => {
-        return val;
-      });
-      this.base = res;
+      let res = await getpaycode(this.orderId);
+      if (res.data) {
+        this.base = res.data;
+      } else {
+        this.$message({
+          message: '订单状态错误！',
+          type: 'error'
+        });
+        this.myshowqr = false;
+      }
     },
     async paystatus() {
       if (this.orderId === '' || this.orderId === null) {
@@ -100,14 +109,21 @@ export default {
     showqr: function(val, oldVal) { // 2
       this.myshowqr = val;
       if (val) {
+        this.base = '';
+        this.orderNo = '';
+        this.orderMoney = 0;
         this.init();
         this.initOrderPrice();
       } else {
         clearInterval(this.intervalid1);
       }
     },
-    myshowqr(val) { // 3
-      this.$emit('dialog', val);
+    myshowqr(val, oldVal) { // 3
+      if (oldVal) {
+        if (!val) {
+          this.$emit('dialog', val);
+        }
+      }
     }
   }
 };

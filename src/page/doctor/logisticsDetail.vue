@@ -46,7 +46,6 @@ export default {
       let res = await getlogisticsdoctororder(this.orderId);
       if (res.code === 0) {
         if (res.data) {
-          console.log(JSON.parse(res.data));
           let obj = JSON.parse(res.data);
           obj.Traces.reverse();
           this.getlogisticsData = obj;

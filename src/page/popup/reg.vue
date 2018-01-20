@@ -138,10 +138,10 @@ export default {
       if (this.countNum === 0) {
         this.countDown = '重新发送';
         this.disableThis = false;
-        console.log('clearInterval');
+        // console.log('clearInterval');
         clearInterval(this.setIntervalThis);
       } else {
-        console.log(this.countDown);
+        // console.log(this.countDown);
         this.countDown = this.countNum + '秒';
         this.disableThis = true;
       }

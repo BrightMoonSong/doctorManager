@@ -108,7 +108,7 @@ export default {
           }
           // console.log(res);
         } else {
-          console.log('error submit!!');
+          // console.log('error submit!!');
           return false;
         }
       });
