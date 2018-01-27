@@ -1,6 +1,6 @@
 <template lang="html">
 <div class="box">
-  <el-tabs type="border-card">
+  <el-tabs type="border-card" @tab-click="tabClickT">
     <el-tab-pane>
       <span slot="label"><i class="el-icon-date"></i> 订单收益</span>
       <div class="el-col el-col-4" style="padding: 5px;padding-left: 0px;">
@@ -314,10 +314,27 @@ export default {
     this.yearMonth2 = date;
     this.yearMonth3 = date;
     this.initData(this.currentPage, this.currentPageSize);
-    this.initData2(this.currentPage2, this.currentPageSize2);
-    this.initData3(this.currentPage3, this.currentPageSize3);
+    // this.initData2(this.currentPage2, this.currentPageSize2);
+    // this.initData3(this.currentPage3, this.currentPageSize3);
   },
   methods: {
+    tabClickT(targetName) {
+      // console.log(targetName.index);
+      // console.log(typeof targetName.index);
+      switch (targetName.index) {
+        case '0':
+          this.searchList();
+          break;
+        case '1':
+          this.searchList2();
+          break;
+        case '2':
+          this.searchList3();
+          break;
+        default:
+          console.log(targetName.index);
+      }
+    },
     onDialogRegChange(val) {
       this.dialogDegShowOrHide = val; // 4
     },
@@ -327,7 +344,7 @@ export default {
     },
     searchList() {
       this.initData(this.currentPage, this.currentPageSize);
-      this.getincome();
+      // this.getincome();
     },
     searchList2() {
       this.initData2(this.currentPage2, this.currentPageSize2);

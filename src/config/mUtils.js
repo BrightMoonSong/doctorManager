@@ -3,11 +3,11 @@
  * 存储OSS位置--//dev:开发环境 、test:测试环境 、pro:生产环境 、pre:预生产环境
  */
 // 头像
- export const setOssPathHeader = 'dev/doctor/header/'
+ export const setOssPathHeader = window.setOssPathHeader;
 // 证件
- export const setOssPathCertificates = 'dev/doctor/certificates/'
+ export const setOssPathCertificates = window.setOssPathCertificates;
 // 处方单
- export const setOssPathPrescription = 'dev/doctor/prescription/'
+ export const setOssPathPrescription = window.setOssPathPrescription;
 
 /**
  * 存储localStorage

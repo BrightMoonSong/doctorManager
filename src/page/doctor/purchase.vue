@@ -380,6 +380,8 @@ export default {
         val.goodsName = val.name1;
       });
       let res = await cartsubmitself(obj);
+      console.log('false');
+      this.twoSub = false;
       if (res.code === 1) {
         this.$router.push('/stockorder');
       }
@@ -403,6 +405,14 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
+            if (this.twoSub) {
+              this.$notify.error({
+                title: '请勿重复提交',
+                message: ''
+              });
+              return;
+            }
+            this.twoSub = true;
             this.downOrderNext();
           }).catch(() => {
             this.$message({

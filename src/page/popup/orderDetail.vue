@@ -14,6 +14,8 @@
     </el-table-column>
     <el-table-column prop="remark" align="center" show-overflow-tooltip label="订单备注">
     </el-table-column>
+    <el-table-column prop="cancelReamrk" v-if="orderStatus0" align="center" show-overflow-tooltip label="取消原因">
+    </el-table-column>
   </el-table>
   <div class="topline"></div>
   <el-form ref="form" label-width="100px" size="mini">
@@ -90,6 +92,7 @@ export default {
     return { // 1
       downifShowThis: this.downifShow,
       imageUrl: '',
+      orderStatus0: false,
       totalPrice: 0,
       toptable: [],
       dataList: {
@@ -132,6 +135,11 @@ export default {
           let arr = [];
           arr.push(res.data);
           this.toptable = arr;
+          if (res.data.orderStatus === 0) {
+            this.orderStatus0 = true;
+          } else {
+            this.orderStatus0 = false;
+          }
           if (res.data.orderGoodsVoList.length > 0) {
             let total = 0;
             res.data.orderGoodsVoList.forEach(val => {

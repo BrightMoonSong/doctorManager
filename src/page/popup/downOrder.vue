@@ -94,6 +94,7 @@ export default {
     return { // 1
       downifShowThis: this.downifShow,
       showImg: false,
+      twoSub: false,
       dataInfo: this.selectTable,
       bigImgSrc: ''
     };
@@ -111,7 +112,14 @@ export default {
   },
   methods: {
     async okDownOrder() {
-      // console.log('最终的确认下单！');
+      if (this.twoSub) {
+        this.$notify.error({
+          title: '请勿重复提交',
+          message: ''
+        });
+        return;
+      }
+      this.twoSub = true;
       let obj = {
         'doctorId': getStore('userId'),
         'orderAddressVo': {
@@ -138,9 +146,8 @@ export default {
         val.goodsName = val.name1;
         val.price = val.salesPrice;
       });
-      // console.log(obj);
       let res = await cartsubmit(obj);
-      // console.log(res);
+      this.twoSub = false;
       if (res.code === 1) {
         this.downifShowThis = false;
         // setStore('orderId', res.data);
